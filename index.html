@@ -15,25 +15,47 @@
     <!-- Navbar -->
     <header class="navbar">
       <div class="container nav-content">
-        <!-- Left Side: Hamburger Menu + Logo + Brand Name -->
+        <!-- Left Side: Brand Logo -->
         <div class="nav-left">
-          <button
-            class="menu-toggle-btn"
-            id="openMenuBtn"
-            aria-label="Open Menu"
-          >
-            ☰
-          </button>
           <a href="#" class="brand">
-            <img src="logo.png" alt="The Clay Pot Logo" class="logo-img" />
+            <img src="logo.png" alt="The Clay Pot Logo" class="logo-img" onerror="this.style.display='none'" />
             <span>The Clay Pot</span>
           </a>
         </div>
 
-        <!-- Right Side: Cart Button -->
+        <!-- Right Side: Settings + Cart + Hamburger Menu -->
         <div class="nav-right">
+          <!-- Settings Dropdown Button -->
+          <div class="settings-dropdown-container">
+            <button class="settings-toggle-btn" id="settingsToggleBtn" title="Settings">
+              ⚙️
+            </button>
+            <div class="settings-dropdown-menu" id="settingsDropdown">
+              <div class="setting-item">
+                <span>🌙 Dark / Light</span>
+                <label class="switch">
+                  <input type="checkbox" id="darkModeToggle" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="setting-item lang-selector">
+                <span>🌐 Language</span>
+                <div class="lang-btns">
+                  <button onclick="changeLanguage('en')" class="lang-btn active" id="enLangBtn">EN</button>
+                  <button onclick="changeLanguage('bn')" class="lang-btn" id="bnLangBtn">বাংলা</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cart Button -->
           <button class="cart-btn" id="openCartBtn">
-            🛒 Cart (<span id="cartCount">0</span>)
+            🛒 <span data-translate="cartText">Cart</span> (<span id="cartCount">0</span>)
+          </button>
+
+          <!-- Hamburger Menu Button -->
+          <button class="menu-toggle-btn" id="openMenuBtn" aria-label="Open Menu">
+            ☰
           </button>
         </div>
       </div>
@@ -43,29 +65,25 @@
     <div class="side-menu-overlay" id="sideMenuOverlay"></div>
     <aside class="side-menu-drawer" id="sideMenuDrawer">
       <div class="side-menu-header">
-        <h3>Navigation Menu</h3>
+        <h3 data-translate="menuTitle">Navigation Menu</h3>
         <button class="close-btn" id="closeMenuBtn">&times;</button>
       </div>
       <ul class="side-menu-links">
-        <li><a href="#" onclick="closeSideMenu()">🏠 Home</a></li>
+        <li><a href="#" onclick="closeSideMenu()" data-translate="navHome">🏠 Home</a></li>
         <li>
-          <a href="#menu" onclick="closeSideMenu()">🍯 Our Menu & Collection</a>
+          <a href="#menu" onclick="closeSideMenu()" data-translate="navMenu">🍯 Our Menu & Collection</a>
         </li>
         <li>
-          <a href="#heritage" onclick="closeSideMenu()">📖 Our Story & Craft</a>
+          <a href="#heritage" onclick="closeSideMenu()" data-translate="navStory">📖 Our Story & Craft</a>
         </li>
         <li>
-          <a href="#payment-info" onclick="closeSideMenu()"
-            >💳 Payment & bKash Info</a
-          >
+          <a href="#payment-info" onclick="closeSideMenu()" data-translate="navPayment">💳 Payment & bKash Info</a>
         </li>
         <li>
-          <a href="#delivery-info" onclick="closeSideMenu()"
-            >🚚 Delivery Areas & Charges</a
-          >
+          <a href="#delivery-info" onclick="closeSideMenu()" data-translate="navDelivery">🚚 Delivery Areas & Charges</a>
         </li>
         <li>
-          <a href="#contact" onclick="closeSideMenu()">📞 Contact & WhatsApp</a>
+          <a href="#contact" onclick="closeSideMenu()" data-translate="navContact">📞 Contact & WhatsApp</a>
         </li>
       </ul>
     </aside>
@@ -74,22 +92,23 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-text">
-          <span class="badge">Authentic Bogra Heritage</span>
-          <h1>Rooted in Tradition,<br />Crafted in Clay.</h1>
-          <p>
+          <span class="badge" data-translate="badge">Authentic Bogra Heritage</span>
+          <h1 data-translate="heroTitle">Rooted in Tradition,<br />Crafted in Clay.</h1>
+          <p data-translate="heroDesc">
             Slow-baked creamy Mishti Doi set in unglazed terracotta pots for
             that unmistakable earthy aroma and caramelized malai crust—delivered
             fresh across Dhaka.
           </p>
           <div class="hero-actions">
-            <a href="#menu" class="btn-primary">Order Now</a>
-            <a href="#heritage" class="btn-secondary">Explore Our Craft</a>
+            <a href="#menu" class="btn-primary" data-translate="orderNowBtn">Order Now</a>
+            <a href="#heritage" class="btn-secondary" data-translate="exploreBtn">Explore Our Craft</a>
           </div>
         </div>
         <div class="hero-image">
           <img
             src="hero-doi.jpeg"
             alt="Bogra Mishti Doi in Clay Pot and Sora"
+            onerror="this.src='https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'"
           />
         </div>
       </div>
@@ -99,8 +118,8 @@
     <section id="menu" class="menu-section">
       <div class="container">
         <div class="section-header">
-          <h2>Our Signature Collection</h2>
-          <p>
+          <h2 data-translate="collTitle">Our Signature Collection</h2>
+          <p data-translate="collDesc">
             Prepared fresh in small batches using pure cow milk and traditional
             clay vessels.
           </p>
@@ -115,29 +134,29 @@
     <section id="heritage" class="heritage-section">
       <div class="container">
         <div class="section-header">
-          <h2>Rooted in Bogra's Soil</h2>
-          <p>
+          <h2 data-translate="soilTitle">Rooted in Bogra's Soil</h2>
+          <p data-translate="soilDesc">
             Discover why our traditional preparation makes all the difference.
           </p>
         </div>
         <div class="heritage-grid">
           <div class="feature-card">
-            <h3>Unglazed Terracotta</h3>
-            <p>
+            <h3 data-translate="feat1Title">Unglazed Terracotta</h3>
+            <p data-translate="feat1Desc">
               Breathable clay pots naturally absorb excess moisture, creating a
               thick, velvety texture and rich aroma.
             </p>
           </div>
           <div class="feature-card">
-            <h3>100% Pure Milk</h3>
-            <p>
+            <h3 data-translate="feat2Title">100% Pure Milk</h3>
+            <p data-translate="feat2Desc">
               Slow-simmered to perfection without artificial thickeners or
               preservatives—just pure, traditional taste.
             </p>
           </div>
           <div class="feature-card">
-            <h3>Fresh Batch Delivery</h3>
-            <p>
+            <h3 data-translate="feat3Title">Fresh Batch Delivery</h3>
+            <p data-translate="feat3Desc">
               Carefully packed and delivered chilled to your doorstep in
               Mohammadpur, Dhanmondi, and surrounding areas.
             </p>
@@ -150,16 +169,16 @@
     <section id="payment-info" class="info-section">
       <div class="container info-grid-container">
         <div class="info-box">
-          <h3>💳 Easy Payment Methods</h3>
-          <p>
+          <h3 data-translate="payTitle">💳 Easy Payment Methods</h3>
+          <p data-translate="payDesc">
             You can pay securely via <strong>bKash, Nagad, Rocket</strong> or
             choose <strong>Cash on Delivery (COD)</strong> when your fresh batch
             arrives at your doorstep in Dhaka.
           </p>
         </div>
         <div class="info-box" id="delivery-info">
-          <h3>🚚 Delivery & Coverage</h3>
-          <p>
+          <h3 data-translate="delTitle">🚚 Delivery & Coverage</h3>
+          <p data-translate="delDesc">
             We deliver across
             <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka
             zones. Standard delivery charge is flat ৳60.
@@ -173,16 +192,14 @@
       <div class="container footer-content">
         <div>
           <h3>The Clay Pot</h3>
-          <p>Rooted in Tradition, Crafted in Clay.</p>
-          <p class="small-note">
+          <p data-translate="footerSub">Rooted in Tradition, Crafted in Clay.</p>
+          <p class="small-note" data-translate="footerNote">
             Dhaka Delivery Hotline / WhatsApp Support Available.
           </p>
         </div>
         <div class="footer-links">
-          <a href="https://wa.me/8801898497847" target="_blank"
-            >WhatsApp Chat</a
-          >
-          <a href="https://facebook.com" target="_blank">Facebook Page</a>
+          <a href="https://wa.me/8801898497847" target="_blank" data-translate="waChat">WhatsApp Chat</a>
+          <a href="https://facebook.com" target="_blank" data-translate="fbPage">Facebook Page</a>
         </div>
       </div>
     </footer>
@@ -191,47 +208,71 @@
     <div class="cart-overlay" id="cartOverlay"></div>
     <aside class="cart-drawer" id="cartDrawer">
       <div class="cart-header">
-        <h3>Your Order Basket</h3>
+        <h3 data-translate="basketTitle">Your Order Basket</h3>
         <button class="close-btn" id="closeCartBtn">&times;</button>
       </div>
 
       <div class="cart-items" id="cartItems">
-        <p class="empty-msg">Your basket is empty.</p>
+        <p class="empty-msg" data-translate="emptyCartMsg">Your basket is empty.</p>
       </div>
 
       <form class="checkout-form" id="checkoutForm">
         <div class="bill-summary">
           <div class="bill-row">
-            <span>Subtotal</span><span id="subtotalText">৳0</span>
+            <span data-translate="subtotalText">Subtotal</span><span id="subtotalText">৳0</span>
           </div>
           <div class="bill-row">
-            <span>Dhaka Delivery</span><span>৳60</span>
+            <span data-translate="deliveryText">Dhaka Delivery</span><span>৳60</span>
           </div>
           <div class="bill-row total">
-            <span>Total Payable</span><span id="totalText">৳60</span>
+            <span data-translate="totalText">Total Payable</span><span id="totalText">৳60</span>
           </div>
         </div>
 
-        <h4>Delivery Details</h4>
-        <input type="text" id="custName" placeholder="Full Name" required />
+        <h4 data-translate="deliveryDetailsTitle">Delivery Details</h4>
+        <input type="text" id="custName" placeholder="Full Name" data-translate-placeholder="namePh" required />
         <input
           type="tel"
           id="custPhone"
           placeholder="Phone Number (e.g., 017XXXXXXXX)"
+          data-translate-placeholder="phonePh"
           required
         />
         <textarea
           id="custAddress"
           rows="2"
           placeholder="Full Address in Dhaka (House, Road, Area)"
+          data-translate-placeholder="addressPh"
           required
         ></textarea>
 
-        <button type="submit" class="btn-primary full-width">
-          Confirm Order via WhatsApp
+        <button type="submit" class="btn-primary full-width" data-translate="confirmOrderBtn">
+          Confirm Order Now
         </button>
       </form>
     </aside>
+
+    <!-- Order Success Modal (Order ID & Confirmation Box) -->
+    <div class="cart-overlay" id="successModalOverlay" style="display: none;"></div>
+    <div class="success-modal" id="successModal" style="display: none;">
+      <div class="success-modal-content">
+        <div class="success-icon">🎉</div>
+        <h3>Order Confirmed Successfully!</h3>
+        <p>Thank you for choosing The Clay Pot. Your order has been placed.</p>
+        
+        <div class="order-details-box">
+          <p><strong>Order ID:</strong> <span id="modalOrderId" style="color: var(--terracotta); font-weight: bold;"></span></p>
+          <p><strong>Customer:</strong> <span id="modalCustName"></span></p>
+          <p><strong>Phone:</strong> <span id="modalCustPhone"></span></p>
+          <p><strong>Delivery Address:</strong> <span id="modalCustAddress"></span></p>
+          <hr style="margin: 10px 0; border: none; border-top: 1px solid var(--border);" />
+          <p><strong>Total Amount:</strong> <span id="modalTotalAmount" style="font-weight: bold;"></span></p>
+        </div>
+
+        <p class="success-note">We will call you shortly to verify your order. Cash on Delivery (COD) is active.</p>
+        <button class="btn-primary full-width" onclick="closeSuccessModal()">Got It / Close</button>
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>
