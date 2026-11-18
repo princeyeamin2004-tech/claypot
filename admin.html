@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | The Clay Pot</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body style="background: var(--bg-cream); padding: 40px 20px;">
+
+  <!-- Password Login Screen (Initially Visible) -->
+  <div id="loginScreen" style="max-width: 400px; margin: 80px auto; background: var(--surface); padding: 30px; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+    <h2 style="margin-bottom: 10px; font-family: 'Playfair Display', serif;">🛡️ Admin Login</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Enter your secret admin password to access orders.</p>
+    <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password" style="width: 100%; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-cream); font-size: 1rem; outline: none;" />
+    <button onclick="verifyAdminPassword()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Login to Dashboard</button>
+    <p id="loginErrorMsg" style="color: #d9534f; font-size: 0.85rem; margin-top: 10px; display: none;"> ভুল পাসওয়ার্ড! দয়া করে সঠিক পাসওয়ার্ড দিন।</p>
+    <div style="margin-top: 20px;">
+      <a href="index.html" style="color: var(--terracotta); text-decoration: none; font-size: 0.9px;">← Back to Website</a>
+    </div>
+  </div>
+
+  <!-- Main Admin Dashboard (Initially Hidden) -->
+  <div id="adminDashboard" class="container" style="max-width: 1000px; display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 15px;">
+      <h2>🛡️ The Clay Pot — Central Admin Dashboard</h2>
+      <div>
+        <a href="index.html" class="btn-secondary" style="padding: 8px 16px; text-decoration: none; margin-right: 10px;">Go to Website</a>
+        <button onclick="adminLogout()" class="btn-primary" style="background: #d9534f; padding: 8px 16px;">Logout</button>
+      </div>
+    </div>
+
+    <div style="background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border);">
+      <h3>Live Customer Orders & Payment Records</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Real-time orders synced from cloud database.</p>
+      
+      <div id="adminOrdersContainer">
+        <p>Loading live orders from database...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // আপনার সিক্রেট অ্যাডমিন পাসওয়ার্ড এখানে সেট করুন (আপনার পছন্দমতো পাসওয়ার্ড দিয়ে দিতে পারেন)
+    const ADMIN_SECRET_PASSWORD = "claypot2026admin";
+
+    function verifyAdminPassword() {
+      const inputVal = document.getElementById("adminPasswordInput").value;
+      if (inputVal === ADMIN_SECRET_PASSWORD) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("adminDashboard").style.display = "block";
+        loadAdminOrders(); // পাসওয়ার্ড সঠিক হলে ডাটা লোড হবে
+      } else {
+        document.getElementById("loginErrorMsg").style.display = "block";
+      }
+    }
+
+    function adminLogout() {
+      document.getElementById("adminDashboard").style.display = "none";
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("adminPasswordInput").value = "";
+      document.getElementById("loginErrorMsg").style.display = "none";
+    }
+
+    // এন্টার প্রেস করলে লগইন করার সুবিধা
+    document.getElementById("adminPasswordInput").addEventListener("keypress", function(e) {
+      if (e.key === 'Enter') { verifyAdminPassword(); }
+    });
+
+    // ফায়ারবেস কনফিগারেশন ও ডেটা ফেচিং লজিক
+    function loadAdminOrders() {
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      const db = firebase.firestore();
+      const container = document.getElementById("adminOrdersContainer");
+
+      db.collection("orders").orderBy("date", "desc").onSnapshot((snapshot) => {
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="empty-msg">No orders found in database.</p>`;
+          return;
+        }
+
+        let html = `<div style="display: flex; flex-direction: column; gap: 14px;">`;
+        snapshot.forEach((doc) => {
+          let o = doc.data();
+          html += `
+            <div style="background: var(--bg-cream); border: 1px solid var(--border); padding: 16px; border-radius: 8px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <h5 style="color: var(--espresso); font-family: 'Playfair Display', serif;">Order ID: #${o.orderId}</h5>
+                <span style="background: #EAF2E9; color: var(--leaf-green); padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">${o.status}</span>
+              </div>
+              <p><strong>Date:</strong> ${o.date}</p>
+              <p><strong>Customer:</strong> ${o.name} (${o.phone})</p>
+              <p><strong>Address:</strong> ${o.address}</p>
+              <p><strong>Items:</strong> ${o.itemsSummary}</p>
+              <p><strong>Payment Method:</strong> ${o.paymentMethod}</p>
+              <p style="margin-top: 6px; font-weight: bold; color: var(--terracotta);">Total Amount: ৳${o.total}</p>
+            </div>
+          `;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+      });
+    }
+  </script>
+</body>
+</html>

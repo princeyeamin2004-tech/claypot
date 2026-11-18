@@ -1,169 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Clay Pot | Authentic Bogra Mishti Doi in Dhaka</title>
-  <link rel="icon" href="images/logo.png" type="image/png" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Clay Pot | Authentic Bogra Mishti Doi in Dhaka</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="container nav-content">
+        <!-- Left Side: Hamburger Menu + Logo + Brand Name -->
+        <div class="nav-left">
+          <button
+            class="menu-toggle-btn"
+            id="openMenuBtn"
+            aria-label="Open Menu"
+          >
+            ☰
+          </button>
+          <a href="#" class="brand">
+            <img src="logo.png" alt="The Clay Pot Logo" class="logo-img" />
+            <span>The Clay Pot</span>
+          </a>
+        </div>
 
-  <!-- Navbar -->
-  <header class="navbar">
-    <div class="container nav-content">
-      <!-- Left Side: Hamburger Menu + Logo + Brand Name -->
-      <div class="nav-left">
-        <button class="menu-toggle-btn" id="openMenuBtn" aria-label="Open Menu">
-          ☰
+        <!-- Right Side: Cart Button -->
+        <div class="nav-right">
+          <button class="cart-btn" id="openCartBtn">
+            🛒 Cart (<span id="cartCount">0</span>)
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Side Navigation Drawer (Hamburger Menu) -->
+    <div class="side-menu-overlay" id="sideMenuOverlay"></div>
+    <aside class="side-menu-drawer" id="sideMenuDrawer">
+      <div class="side-menu-header">
+        <h3>Navigation Menu</h3>
+        <button class="close-btn" id="closeMenuBtn">&times;</button>
+      </div>
+      <ul class="side-menu-links">
+        <li><a href="#" onclick="closeSideMenu()">🏠 Home</a></li>
+        <li>
+          <a href="#menu" onclick="closeSideMenu()">🍯 Our Menu & Collection</a>
+        </li>
+        <li>
+          <a href="#heritage" onclick="closeSideMenu()">📖 Our Story & Craft</a>
+        </li>
+        <li>
+          <a href="#payment-info" onclick="closeSideMenu()"
+            >💳 Payment & bKash Info</a
+          >
+        </li>
+        <li>
+          <a href="#delivery-info" onclick="closeSideMenu()"
+            >🚚 Delivery Areas & Charges</a
+          >
+        </li>
+        <li>
+          <a href="#contact" onclick="closeSideMenu()">📞 Contact & WhatsApp</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <span class="badge">Authentic Bogra Heritage</span>
+          <h1>Rooted in Tradition,<br />Crafted in Clay.</h1>
+          <p>
+            Slow-baked creamy Mishti Doi set in unglazed terracotta pots for
+            that unmistakable earthy aroma and caramelized malai crust—delivered
+            fresh across Dhaka.
+          </p>
+          <div class="hero-actions">
+            <a href="#menu" class="btn-primary">Order Now</a>
+            <a href="#heritage" class="btn-secondary">Explore Our Craft</a>
+          </div>
+        </div>
+        <div class="hero-image">
+          <img
+            src="hero-doi.jpeg"
+            alt="Bogra Mishti Doi in Clay Pot and Sora"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Signature Menu -->
+    <section id="menu" class="menu-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Our Signature Collection</h2>
+          <p>
+            Prepared fresh in small batches using pure cow milk and traditional
+            clay vessels.
+          </p>
+        </div>
+        <div class="product-grid" id="productGrid">
+          <!-- Products injected via script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Heritage & Story Section -->
+    <section id="heritage" class="heritage-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Rooted in Bogra's Soil</h2>
+          <p>
+            Discover why our traditional preparation makes all the difference.
+          </p>
+        </div>
+        <div class="heritage-grid">
+          <div class="feature-card">
+            <h3>Unglazed Terracotta</h3>
+            <p>
+              Breathable clay pots naturally absorb excess moisture, creating a
+              thick, velvety texture and rich aroma.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>100% Pure Milk</h3>
+            <p>
+              Slow-simmered to perfection without artificial thickeners or
+              preservatives—just pure, traditional taste.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>Fresh Batch Delivery</h3>
+            <p>
+              Carefully packed and delivered chilled to your doorstep in
+              Mohammadpur, Dhanmondi, and surrounding areas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payment Info Section -->
+    <section id="payment-info" class="info-section">
+      <div class="container info-grid-container">
+        <div class="info-box">
+          <h3>💳 Easy Payment Methods</h3>
+          <p>
+            You can pay securely via <strong>bKash, Nagad, Rocket</strong> or
+            choose <strong>Cash on Delivery (COD)</strong> when your fresh batch
+            arrives at your doorstep in Dhaka.
+          </p>
+        </div>
+        <div class="info-box" id="delivery-info">
+          <h3>🚚 Delivery & Coverage</h3>
+          <p>
+            We deliver across
+            <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka
+            zones. Standard delivery charge is flat ৳60.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+      <div class="container footer-content">
+        <div>
+          <h3>The Clay Pot</h3>
+          <p>Rooted in Tradition, Crafted in Clay.</p>
+          <p class="small-note">
+            Dhaka Delivery Hotline / WhatsApp Support Available.
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="https://wa.me/8801898497847" target="_blank"
+            >WhatsApp Chat</a
+          >
+          <a href="https://facebook.com" target="_blank">Facebook Page</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Slide-Out Cart & Checkout Drawer -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <aside class="cart-drawer" id="cartDrawer">
+      <div class="cart-header">
+        <h3>Your Order Basket</h3>
+        <button class="close-btn" id="closeCartBtn">&times;</button>
+      </div>
+
+      <div class="cart-items" id="cartItems">
+        <p class="empty-msg">Your basket is empty.</p>
+      </div>
+
+      <form class="checkout-form" id="checkoutForm">
+        <div class="bill-summary">
+          <div class="bill-row">
+            <span>Subtotal</span><span id="subtotalText">৳0</span>
+          </div>
+          <div class="bill-row">
+            <span>Dhaka Delivery</span><span>৳60</span>
+          </div>
+          <div class="bill-row total">
+            <span>Total Payable</span><span id="totalText">৳60</span>
+          </div>
+        </div>
+
+        <h4>Delivery Details</h4>
+        <input type="text" id="custName" placeholder="Full Name" required />
+        <input
+          type="tel"
+          id="custPhone"
+          placeholder="Phone Number (e.g., 017XXXXXXXX)"
+          required
+        />
+        <textarea
+          id="custAddress"
+          rows="2"
+          placeholder="Full Address in Dhaka (House, Road, Area)"
+          required
+        ></textarea>
+
+        <button type="submit" class="btn-primary full-width">
+          Confirm Order via WhatsApp
         </button>
-        <a href="#" class="brand">
-          <img src="images/logo.png" alt="The Clay Pot Logo" class="logo-img" />
-          <span>The Clay Pot</span>
-        </a>
-      </div>
-      
-      <!-- Right Side: Cart Button -->
-      <div class="nav-right">
-        <button class="cart-btn" id="openCartBtn">
-          🛒 Cart (<span id="cartCount">0</span>)
-        </button>
-      </div>
-    </div>
-  </header>
+      </form>
+    </aside>
 
-  <!-- Side Navigation Drawer (Hamburger Menu) -->
-  <div class="side-menu-overlay" id="sideMenuOverlay"></div>
-  <aside class="side-menu-drawer" id="sideMenuDrawer">
-    <div class="side-menu-header">
-      <h3>Navigation Menu</h3>
-      <button class="close-btn" id="closeMenuBtn">&times;</button>
-    </div>
-    <ul class="side-menu-links">
-      <li><a href="#" onclick="closeSideMenu()">🏠 Home</a></li>
-      <li><a href="#menu" onclick="closeSideMenu()">🍯 Our Menu & Collection</a></li>
-      <li><a href="#heritage" onclick="closeSideMenu()">📖 Our Story & Craft</a></li>
-      <li><a href="#payment-info" onclick="closeSideMenu()">💳 Payment & bKash Info</a></li>
-      <li><a href="#delivery-info" onclick="closeSideMenu()">🚚 Delivery Areas & Charges</a></li>
-      <li><a href="#contact" onclick="closeSideMenu()">📞 Contact & WhatsApp</a></li>
-    </ul>
-  </aside>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-text">
-        <span class="badge">Authentic Bogra Heritage</span>
-        <h1>Rooted in Tradition,<br />Crafted in Clay.</h1>
-        <p>
-          Slow-baked creamy Mishti Doi set in unglazed terracotta pots for that unmistakable earthy aroma and caramelized malai crust—delivered fresh across Dhaka.
-        </p>
-        <div class="hero-actions">
-          <a href="#menu" class="btn-primary">Order Now</a>
-          <a href="#heritage" class="btn-secondary">Explore Our Craft</a>
-        </div>
-      </div>
-      <div class="hero-image">
-        <img src="images/hero-doi.jpg" alt="Bogra Mishti Doi in Clay Pot and Sora" />
-      </div>
-    </div>
-  </section>
-
-  <!-- Signature Menu -->
-  <section id="menu" class="menu-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Our Signature Collection</h2>
-        <p>Prepared fresh in small batches using pure cow milk and traditional clay vessels.</p>
-      </div>
-      <div class="product-grid" id="productGrid">
-        <!-- Products injected via script.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Heritage & Story Section -->
-  <section id="heritage" class="heritage-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Rooted in Bogra's Soil</h2>
-        <p>Discover why our traditional preparation makes all the difference.</p>
-      </div>
-      <div class="heritage-grid">
-        <div class="feature-card">
-          <h3>Unglazed Terracotta</h3>
-          <p>Breathable clay pots naturally absorb excess moisture, creating a thick, velvety texture and rich aroma.</p>
-        </div>
-        <div class="feature-card">
-          <h3>100% Pure Milk</h3>
-          <p>Slow-simmered to perfection without artificial thickeners or preservatives—just pure, traditional taste.</p>
-        </div>
-        <div class="feature-card">
-          <h3>Fresh Batch Delivery</h3>
-          <p>Carefully packed and delivered chilled to your doorstep in Mohammadpur, Dhanmondi, and surrounding areas.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Payment Info Section -->
-  <section id="payment-info" class="info-section">
-    <div class="container info-grid-container">
-      <div class="info-box">
-        <h3>💳 Easy Payment Methods</h3>
-        <p>You can pay securely via <strong>bKash, Nagad, Rocket</strong> or choose <strong>Cash on Delivery (COD)</strong> when your fresh batch arrives at your doorstep in Dhaka.</p>
-      </div>
-      <div class="info-box" id="delivery-info">
-        <h3>🚚 Delivery & Coverage</h3>
-        <p>We deliver across <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka zones. Standard delivery charge is flat ৳60.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer id="contact" class="footer">
-    <div class="container footer-content">
-      <div>
-        <h3>The Clay Pot</h3>
-        <p>Rooted in Tradition, Crafted in Clay.</p>
-        <p class="small-note">Dhaka Delivery Hotline / WhatsApp Support Available.</p>
-      </div>
-      <div class="footer-links">
-        <a href="https://wa.me/8801898497847" target="_blank">WhatsApp Chat</a>
-        <a href="https://facebook.com" target="_blank">Facebook Page</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Slide-Out Cart & Checkout Drawer -->
-  <div class="cart-overlay" id="cartOverlay"></div>
-  <aside class="cart-drawer" id="cartDrawer">
-    <div class="cart-header">
-      <h3>Your Order Basket</h3>
-      <button class="close-btn" id="closeCartBtn">&times;</button>
-    </div>
-
-    <div class="cart-items" id="cartItems">
-      <p class="empty-msg">Your basket is empty.</p>
-    </div>
-
-    <form class="checkout-form" id="checkoutForm">
-      <div class="bill-summary">
-        <div class="bill-row"><span>Subtotal</span><span id="subtotalText">৳0</span></div>
-        <div class="bill-row"><span>Dhaka Delivery</span><span>৳60</span></div>
-        <div class="bill-row total"><span>Total Payable</span><span id="totalText">৳60</span></div>
-      </div>
-
-      <h4>Delivery Details</h4>
-      <input type="text" id="custName" placeholder="Full Name" required />
-      <input type="tel" id="custPhone" placeholder="Phone Number (e.g., 017XXXXXXXX)" required />
-      <textarea id="custAddress" rows="2" placeholder="Full Address in Dhaka (House, Road, Area)" required></textarea>
-
-      <button type="submit" class="btn-primary full-width">Confirm Order via WhatsApp</button>
-    </form>
-  </aside>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
