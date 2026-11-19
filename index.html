@@ -3,13 +3,139 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Clay Pot | Authentic Bogra Mishti Doi in Dhaka</title>
+    <title>The Clay Pot | Authentic Bogura Mishti Doi in Dhaka</title>
     <link rel="icon" href="logo.png" type="image/png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      .drawer-settings {
+        padding: 14px 20px 20px;
+        border-top: 1px solid var(--border);
+        margin-top: 10px;
+      }
+      .drawer-settings-trigger {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: transparent;
+        border: none;
+        color: var(--espresso);
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 8px 4px;
+        cursor: pointer;
+        text-align: left;
+      }
+      .drawer-settings-trigger:hover {
+        color: var(--terracotta);
+      }
+      .drawer-settings-arrow {
+        font-size: 0.85rem;
+        transition: transform 0.25s ease;
+        color: var(--text-muted);
+      }
+      .drawer-settings.open .drawer-settings-arrow {
+        transform: rotate(180deg);
+      }
+      .drawer-settings-panel {
+        display: none;
+        padding-top: 12px;
+        margin-top: 6px;
+        border-top: 1px dashed var(--border);
+      }
+      .drawer-settings.open .drawer-settings-panel {
+        display: block;
+      }
+      .drawer-settings-panel .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .drawer-settings-panel .setting-item:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Interactive Payment Methods Box */
+      .payment-clickable-box {
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .payment-clickable-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      }
+      .payment-click-hint {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--terracotta);
+      }
+      .payment-methods-panel {
+        display: none;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--border);
+      }
+      .payment-clickable-box.open .payment-methods-panel {
+        display: block;
+      }
+      .payment-option-card {
+        background: var(--bg-cream);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+      }
+      .payment-option-card:last-child {
+        margin-bottom: 0;
+      }
+      .payment-option-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .payment-method-title {
+        font-weight: 600;
+        color: var(--espresso);
+        font-size: 0.95rem;
+      }
+      .payment-number-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+      .payment-number-val {
+        font-family: monospace;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--terracotta);
+      }
+      .copy-num-btn {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--espresso);
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 0.78rem;
+        cursor: pointer;
+      }
+      .copy-num-btn:hover {
+        border-color: var(--terracotta);
+        color: var(--terracotta);
+      }
+    </style>
   </head>
   <body>
     <!-- Navbar -->
@@ -18,43 +144,31 @@
         <!-- Left Side: Brand Logo -->
         <div class="nav-left">
           <a href="#" class="brand">
-            <img src="logo.png" alt="The Clay Pot Logo" class="logo-img" onerror="this.style.display='none'" />
+            <img
+              src="logo.png"
+              alt="The Clay Pot Logo"
+              class="logo-img"
+              onerror="this.style.display='none'"
+            />
             <span>The Clay Pot</span>
           </a>
         </div>
 
-        <!-- Right Side: Settings + Cart + Hamburger Menu -->
+        <!-- Right Side: Cart + Hamburger Menu -->
         <div class="nav-right">
-          <!-- Settings Dropdown Button -->
-          <div class="settings-dropdown-container">
-            <button class="settings-toggle-btn" id="settingsToggleBtn" title="Settings">
-              ⚙️
-            </button>
-            <div class="settings-dropdown-menu" id="settingsDropdown">
-              <div class="setting-item">
-                <span>🌙 Dark / Light</span>
-                <label class="switch">
-                  <input type="checkbox" id="darkModeToggle" />
-                  <span class="slider round"></span>
-                </label>
-              </div>
-              <div class="setting-item lang-selector">
-                <span>🌐 Language</span>
-                <div class="lang-btns">
-                  <button onclick="changeLanguage('en')" class="lang-btn active" id="enLangBtn">EN</button>
-                  <button onclick="changeLanguage('bn')" class="lang-btn" id="bnLangBtn">বাংলা</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Cart Button -->
           <button class="cart-btn" id="openCartBtn">
-            🛒 <span data-translate="cartText">Cart</span> (<span id="cartCount">0</span>)
+            🛒 <span data-translate="cartText">Cart</span> (<span id="cartCount"
+              >0</span
+            >)
           </button>
 
           <!-- Hamburger Menu Button -->
-          <button class="menu-toggle-btn" id="openMenuBtn" aria-label="Open Menu">
+          <button
+            class="menu-toggle-btn"
+            id="openMenuBtn"
+            aria-label="Open Menu"
+          >
             ☰
           </button>
         </div>
@@ -69,45 +183,127 @@
         <button class="close-btn" id="closeMenuBtn">&times;</button>
       </div>
       <ul class="side-menu-links">
-        <li><a href="#" onclick="closeSideMenu()" data-translate="navHome">🏠 Home</a></li>
         <li>
-          <a href="#menu" onclick="closeSideMenu()" data-translate="navMenu">🍯 Our Menu & Collection</a>
+          <a href="#" onclick="closeSideMenu()" data-translate="navHome"
+            >🏠 Home</a
+          >
         </li>
         <li>
-          <a href="#heritage" onclick="closeSideMenu()" data-translate="navStory">📖 Our Story & Craft</a>
+          <a href="#menu" onclick="closeSideMenu()" data-translate="navMenu"
+            >🍯 Our Menu & Collection</a
+          >
         </li>
         <li>
-          <a href="#payment-info" onclick="closeSideMenu()" data-translate="navPayment">💳 Payment & bKash Info</a>
+          <a
+            href="#heritage"
+            onclick="closeSideMenu()"
+            data-translate="navStory"
+            >📖 Our Story & Craft</a
+          >
         </li>
         <li>
-          <a href="#delivery-info" onclick="closeSideMenu()" data-translate="navDelivery">🚚 Delivery Areas & Charges</a>
+          <a
+            href="#payment-info"
+            onclick="closeSideMenu(); openPaymentDetailsFromMenu();"
+            data-translate="navPayment"
+            >💳 Payment Info</a
+          >
         </li>
         <li>
-          <a href="#contact" onclick="closeSideMenu()" data-translate="navContact">📞 Contact & WhatsApp</a>
+          <a
+            href="#delivery-info"
+            onclick="closeSideMenu()"
+            data-translate="navDelivery"
+            >🚚 Delivery Areas & Charges</a
+          >
+        </li>
+        <li>
+          <a
+            href="#contact"
+            onclick="closeSideMenu()"
+            data-translate="navContact"
+            >📞 Contact & WhatsApp</a
+          >
         </li>
       </ul>
+
+      <!-- Collapsible Settings Option Below Navigation Links -->
+      <div class="drawer-settings" id="drawerSettings">
+        <button
+          type="button"
+          class="drawer-settings-trigger"
+          id="drawerSettingsToggle"
+          aria-expanded="false"
+          aria-controls="drawerSettingsPanel"
+        >
+          <span>⚙️ <span data-translate="settingsText">Settings</span></span>
+          <span class="drawer-settings-arrow" id="drawerSettingsArrow">▼</span>
+        </button>
+
+        <div class="drawer-settings-panel" id="drawerSettingsPanel">
+          <div class="setting-item">
+            <span>🌙 Dark / Light</span>
+            <label class="switch">
+              <input type="checkbox" id="darkModeToggle" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="setting-item lang-selector">
+            <span>🌐 Language</span>
+            <div class="lang-btns">
+              <button
+                type="button"
+                onclick="changeLanguage('en')"
+                class="lang-btn active"
+                id="enLangBtn"
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onclick="changeLanguage('bn')"
+                class="lang-btn"
+                id="bnLangBtn"
+              >
+                বাংলা
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- Hero Section -->
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-text">
-          <span class="badge" data-translate="badge">Authentic Bogra Heritage</span>
-          <h1 data-translate="heroTitle">Rooted in Tradition,<br />Crafted in Clay.</h1>
+          <span class="badge" data-translate="badge"
+            >Authentic Bogura Heritage</span
+          >
+          <h1 data-translate="heroTitle">
+            Rooted in Tradition,<br />Crafted in Clay.
+          </h1>
           <p data-translate="heroDesc">
             Slow-baked creamy Mishti Doi set in unglazed terracotta pots for
             that unmistakable earthy aroma and caramelized malai crust—delivered
             fresh across Dhaka.
           </p>
           <div class="hero-actions">
-            <a href="#menu" class="btn-primary" data-translate="orderNowBtn">Order Now</a>
-            <a href="#heritage" class="btn-secondary" data-translate="exploreBtn">Explore Our Craft</a>
+            <a href="#menu" class="btn-primary" data-translate="orderNowBtn"
+              >Order Now</a
+            >
+            <a
+              href="#heritage"
+              class="btn-secondary"
+              data-translate="exploreBtn"
+              >Explore Our Craft</a
+            >
           </div>
         </div>
         <div class="hero-image">
           <img
             src="hero-doi.jpeg"
-            alt="Bogra Mishti Doi in Clay Pot and Sora"
+            alt="Bogura Mishti Doi in Clay Pot and Sora"
             onerror="this.src='https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'"
           />
         </div>
@@ -134,7 +330,7 @@
     <section id="heritage" class="heritage-section">
       <div class="container">
         <div class="section-header">
-          <h2 data-translate="soilTitle">Rooted in Bogra's Soil</h2>
+          <h2 data-translate="soilTitle">Rooted in Bogura's Soil</h2>
           <p data-translate="soilDesc">
             Discover why our traditional preparation makes all the difference.
           </p>
@@ -168,14 +364,149 @@
     <!-- Payment Info Section -->
     <section id="payment-info" class="info-section">
       <div class="container info-grid-container">
-        <div class="info-box">
+        <div
+          class="info-box payment-clickable-box"
+          id="easyPaymentBox"
+          onclick="togglePaymentMethodsPanel()"
+          role="button"
+          tabindex="0"
+          aria-expanded="false"
+        >
           <h3 data-translate="payTitle">💳 Easy Payment Methods</h3>
           <p data-translate="payDesc">
             You can pay securely via <strong>bKash, Nagad, Rocket</strong> or
             choose <strong>Cash on Delivery (COD)</strong> when your fresh batch
             arrives at your doorstep in Dhaka.
           </p>
+          <span
+            class="payment-click-hint"
+            id="paymentToggleHint"
+            data-translate="payClickHint"
+          >
+            ▼ Click to view numbers & payment options
+          </span>
+
+          <!-- Expandable Payment Options & Numbers -->
+          <div
+            class="payment-methods-panel"
+            id="paymentMethodsPanel"
+            onclick="event.stopPropagation()"
+          >
+            <!-- bKash -->
+            <div class="payment-option-card">
+              <div class="payment-option-top">
+                <span class="payment-method-title" data-translate="bkashLabel"
+                  >📱 bKash (Personal)</span
+                >
+                <span
+                  style="font-size: 0.78rem; color: var(--text-muted)"
+                  data-translate="sendMoneyTag"
+                  >Send Money</span
+                >
+              </div>
+              <div class="payment-number-row">
+                <span data-translate="numberLabel">Number:</span>
+                <span class="payment-number-val" id="bkashNumberText"
+                  >01797971421</span
+                >
+                <button
+                  type="button"
+                  class="copy-num-btn"
+                  onclick="copyPaymentNumber('bkashNumberText', this)"
+                  data-translate="copyBtn"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <!-- Nagad -->
+            <div class="payment-option-card">
+              <div class="payment-option-top">
+                <span class="payment-method-title" data-translate="nagadLabel"
+                  >📲 Nagad (Personal)</span
+                >
+                <span
+                  style="font-size: 0.78rem; color: var(--text-muted)"
+                  data-translate="sendMoneyTag"
+                  >Send Money</span
+                >
+              </div>
+              <div class="payment-number-row">
+                <span data-translate="numberLabel">Number:</span>
+                <span class="payment-number-val" id="nagadNumberText"
+                  >01797971421</span
+                >
+                <button
+                  type="button"
+                  class="copy-num-btn"
+                  onclick="copyPaymentNumber('nagadNumberText', this)"
+                  data-translate="copyBtn"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <!-- Rocket -->
+            <div class="payment-option-card">
+              <div class="payment-option-top">
+                <span class="payment-method-title" data-translate="rocketLabel"
+                  >🚀 Rocket (Personal)</span
+                >
+                <span
+                  style="font-size: 0.78rem; color: var(--text-muted)"
+                  data-translate="sendMoneyTag"
+                  >Send Money</span
+                >
+              </div>
+              <div class="payment-number-row">
+                <span data-translate="numberLabel">Number:</span>
+                <span class="payment-number-val" id="rocketNumberText"
+                  >01797971421</span
+                >
+                <button
+                  type="button"
+                  class="copy-num-btn"
+                  onclick="copyPaymentNumber('rocketNumberText', this)"
+                  data-translate="copyBtn"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <!-- Cash on Delivery -->
+            <div class="payment-option-card">
+              <div class="payment-option-top">
+                <span class="payment-method-title" data-translate="codLabel"
+                  >💵 Cash on Delivery (COD)</span
+                >
+                <span
+                  style="
+                    font-size: 0.78rem;
+                    color: var(--terracotta);
+                    font-weight: 600;
+                  "
+                  data-translate="availableTag"
+                  >Available</span
+                >
+              </div>
+              <p
+                style="
+                  margin-top: 6px;
+                  font-size: 0.86rem;
+                  color: var(--text-muted);
+                "
+                data-translate="codDesc"
+              >
+                Pay in cash to the delivery rider upon receiving your order in
+                Dhaka.
+              </p>
+            </div>
+          </div>
         </div>
+
         <div class="info-box" id="delivery-info">
           <h3 data-translate="delTitle">🚚 Delivery & Coverage</h3>
           <p data-translate="delDesc">
@@ -192,14 +523,23 @@
       <div class="container footer-content">
         <div>
           <h3>The Clay Pot</h3>
-          <p data-translate="footerSub">Rooted in Tradition, Crafted in Clay.</p>
+          <p data-translate="footerSub">
+            Rooted in Tradition, Crafted in Clay.
+          </p>
           <p class="small-note" data-translate="footerNote">
             Dhaka Delivery Hotline / WhatsApp Support Available.
           </p>
         </div>
         <div class="footer-links">
-          <a href="https://wa.me/8801898497847" target="_blank" data-translate="waChat">WhatsApp Chat</a>
-          <a href="https://facebook.com" target="_blank" data-translate="fbPage">Facebook Page</a>
+          <a
+            href="https://wa.me/8801898497847"
+            target="_blank"
+            data-translate="waChat"
+            >WhatsApp Chat</a
+          >
+          <a href="https://facebook.com" target="_blank" data-translate="fbPage"
+            >Facebook Page</a
+          >
         </div>
       </div>
     </footer>
@@ -213,24 +553,35 @@
       </div>
 
       <div class="cart-items" id="cartItems">
-        <p class="empty-msg" data-translate="emptyCartMsg">Your basket is empty.</p>
+        <p class="empty-msg" data-translate="emptyCartMsg">
+          Your basket is empty.
+        </p>
       </div>
 
       <form class="checkout-form" id="checkoutForm">
         <div class="bill-summary">
           <div class="bill-row">
-            <span data-translate="subtotalText">Subtotal</span><span id="subtotalText">৳0</span>
+            <span data-translate="subtotalText">Subtotal</span
+            ><span id="subtotalText">৳0</span>
           </div>
           <div class="bill-row">
-            <span data-translate="deliveryText">Dhaka Delivery</span><span>৳60</span>
+            <span data-translate="deliveryText">Dhaka Delivery</span
+            ><span>৳60</span>
           </div>
           <div class="bill-row total">
-            <span data-translate="totalText">Total Payable</span><span id="totalText">৳60</span>
+            <span data-translate="totalText">Total Payable</span
+            ><span id="totalText">৳60</span>
           </div>
         </div>
 
         <h4 data-translate="deliveryDetailsTitle">Delivery Details</h4>
-        <input type="text" id="custName" placeholder="Full Name" data-translate-placeholder="namePh" required />
+        <input
+          type="text"
+          id="custName"
+          placeholder="Full Name"
+          data-translate-placeholder="namePh"
+          required
+        />
         <input
           type="tel"
           id="custPhone"
@@ -246,34 +597,181 @@
           required
         ></textarea>
 
-        <button type="submit" class="btn-primary full-width" data-translate="confirmOrderBtn">
+        <button
+          type="submit"
+          class="btn-primary full-width"
+          data-translate="confirmOrderBtn"
+        >
           Confirm Order Now
         </button>
       </form>
     </aside>
 
     <!-- Order Success Modal (Order ID & Confirmation Box) -->
-    <div class="cart-overlay" id="successModalOverlay" style="display: none;"></div>
-    <div class="success-modal" id="successModal" style="display: none;">
+    <div
+      class="cart-overlay"
+      id="successModalOverlay"
+      style="display: none"
+    ></div>
+    <div class="success-modal" id="successModal" style="display: none">
       <div class="success-modal-content">
         <div class="success-icon">🎉</div>
         <h3>Order Confirmed Successfully!</h3>
         <p>Thank you for choosing The Clay Pot. Your order has been placed.</p>
-        
+
         <div class="order-details-box">
-          <p><strong>Order ID:</strong> <span id="modalOrderId" style="color: var(--terracotta); font-weight: bold;"></span></p>
+          <p>
+            <strong>Order ID:</strong>
+            <span
+              id="modalOrderId"
+              style="color: var(--terracotta); font-weight: bold"
+            ></span>
+          </p>
           <p><strong>Customer:</strong> <span id="modalCustName"></span></p>
           <p><strong>Phone:</strong> <span id="modalCustPhone"></span></p>
-          <p><strong>Delivery Address:</strong> <span id="modalCustAddress"></span></p>
-          <hr style="margin: 10px 0; border: none; border-top: 1px solid var(--border);" />
-          <p><strong>Total Amount:</strong> <span id="modalTotalAmount" style="font-weight: bold;"></span></p>
+          <p>
+            <strong>Delivery Address:</strong>
+            <span id="modalCustAddress"></span>
+          </p>
+          <hr
+            style="
+              margin: 10px 0;
+              border: none;
+              border-top: 1px solid var(--border);
+            "
+          />
+          <p>
+            <strong>Total Amount:</strong>
+            <span id="modalTotalAmount" style="font-weight: bold"></span>
+          </p>
         </div>
 
-        <p class="success-note">We will call you shortly to verify your order. Cash on Delivery (COD) is active.</p>
-        <button class="btn-primary full-width" onclick="closeSuccessModal()">Got It / Close</button>
+        <p class="success-note">
+          We will call you shortly to verify your order. Cash on Delivery (COD)
+          is active.
+        </p>
+        <button class="btn-primary full-width" onclick="closeSuccessModal()">
+          Got It / Close
+        </button>
       </div>
     </div>
 
+    <script>
+      const paymentTranslations = {
+        en: {
+          navPayment: '💳 Payment Info',
+          payClickHint: '▼ Click to view numbers & payment options',
+          payHideHint: '▲ Click to hide numbers & payment options',
+          bkashLabel: '📱 bKash (Personal)',
+          nagadLabel: '📲 Nagad (Personal)',
+          rocketLabel: '🚀 Rocket (Personal)',
+          sendMoneyTag: 'Send Money',
+          numberLabel: 'Number:',
+          copyBtn: 'Copy',
+          copiedBtn: 'Copied!',
+          codLabel: '💵 Cash on Delivery (COD)',
+          availableTag: 'Available',
+          codDesc:
+            'Pay in cash to the delivery rider upon receiving your order in Dhaka.',
+        },
+        bn: {
+          navPayment: '💳 পেমেন্ট তথ্য',
+          payClickHint: '▼ নম্বর ও পেমেন্ট অপশন দেখতে ক্লিক করুন',
+          payHideHint: '▲ নম্বর ও পেমেন্ট অপশন লুকাতে ক্লিক করুন',
+          bkashLabel: '📱 বিকাশ (পার্সোনাল)',
+          nagadLabel: '📲 নগদ (পার্সোনাল)',
+          rocketLabel: '🚀 রকেট (পার্সোনাল)',
+          sendMoneyTag: 'সেন্ড মানি',
+          numberLabel: 'নম্বর:',
+          copyBtn: 'কপি',
+          copiedBtn: 'কপি হয়েছে!',
+          codLabel: '💵 ক্যাশ অন ডেলিভারি (COD)',
+          availableTag: 'চালু আছে',
+          codDesc:
+            'ঢাকায় অর্ডার হাতে পাওয়ার পর ডেলিভারি রাইডারকে ক্যাশ টাকা দিন।',
+        },
+      };
+
+      function getCurrentPaymentLang() {
+        const bnBtn = document.getElementById('bnLangBtn');
+        if (bnBtn && bnBtn.classList.contains('active')) return 'bn';
+        return localStorage.getItem('lang') === 'bn' ? 'bn' : 'en';
+      }
+
+      function applyPaymentLanguage(lang) {
+        const dict = paymentTranslations[lang] || paymentTranslations.en;
+        document
+          .querySelectorAll(
+            "#payment-info [data-translate], [data-translate='navPayment']"
+          )
+          .forEach((el) => {
+            const key = el.getAttribute('data-translate');
+            if (key === 'payClickHint') {
+              const isOpen = document
+                .getElementById('easyPaymentBox')
+                ?.classList.contains('open');
+              el.textContent = isOpen ? dict.payHideHint : dict.payClickHint;
+            } else if (dict[key]) {
+              el.textContent = dict[key];
+            }
+          });
+      }
+
+      function togglePaymentMethodsPanel(forceOpen = false) {
+        const box = document.getElementById('easyPaymentBox');
+        if (!box) return;
+        const shouldOpen = forceOpen ? true : !box.classList.contains('open');
+        box.classList.toggle('open', shouldOpen);
+        box.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+        applyPaymentLanguage(getCurrentPaymentLang());
+      }
+
+      function openPaymentDetailsFromMenu() {
+        togglePaymentMethodsPanel(true);
+      }
+
+      function copyPaymentNumber(elementId, btnEl) {
+        const numEl = document.getElementById(elementId);
+        if (!numEl) return;
+        const textToCopy = numEl.textContent.trim();
+        const lang = getCurrentPaymentLang();
+        const dict = paymentTranslations[lang] || paymentTranslations.en;
+
+        navigator.clipboard?.writeText(textToCopy).catch(() => {});
+        const prevText = btnEl.textContent;
+        btnEl.textContent = dict.copiedBtn;
+        setTimeout(() => {
+          btnEl.textContent = dict.copyBtn || prevText;
+        }, 1400);
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const settingsContainer = document.getElementById('drawerSettings');
+        const settingsToggle = document.getElementById('drawerSettingsToggle');
+
+        if (settingsContainer && settingsToggle) {
+          settingsToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = settingsContainer.classList.toggle('open');
+            settingsToggle.setAttribute(
+              'aria-expanded',
+              isOpen ? 'true' : 'false'
+            );
+          });
+        }
+
+        const enBtn = document.getElementById('enLangBtn');
+        const bnBtn = document.getElementById('bnLangBtn');
+        if (enBtn) {
+          enBtn.addEventListener('click', () => applyPaymentLanguage('en'));
+        }
+        if (bnBtn) {
+          bnBtn.addEventListener('click', () => applyPaymentLanguage('bn'));
+        }
+
+        applyPaymentLanguage(getCurrentPaymentLang());
+      });
+    </script>
     <script src="script.js"></script>
   </body>
 </html>
