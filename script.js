@@ -2,6 +2,31 @@
 const WHATSAPP_NUMBER = '8801898497847';
 const DELIVERY_FEE = 60;
 const CUSTOMER_ORDERS_KEY = 'clayPotCustomerOrders';
+const FIREBASE_ORDERS_PATH = 'clayPotOrders';
+
+// Firebase Configuration (`the-clay-pot` Realtime Database)
+const firebaseConfig = {
+  apiKey: 'AIzaSyDucXr5F3nd5rmSUGz-EwsxpB2e9517k_Q',
+  authDomain: 'the-clay-pot.firebaseapp.com',
+  databaseURL: 'https://the-clay-pot-default-rtdb.firebaseio.com',
+  projectId: 'the-clay-pot',
+  storageBucket: 'the-clay-pot.firebasestorage.app',
+  messagingSenderId: '218391329107',
+  appId: '1:218391329107:web:633e54ae86e84e129389a6',
+  measurementId: 'G-D9Z287BQR5',
+};
+
+let rtdb = null;
+try {
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    rtdb = firebase.database();
+  }
+} catch (err) {
+  console.error('Firebase initialization warning:', err);
+}
 
 // Translations Dictionary (English & Bengali)
 const translations = {
@@ -214,6 +239,39 @@ const products = [
 
 let cart = [];
 
+// Save Order to Firebase Realtime Database (with localStorage fallback)
+async function saveOrderToFirebaseRealtime(orderObj) {
+  // Always keep local copy for instant admin view on same browser if offline
+  try {
+    let existingOrders =
+      JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+    existingOrders.unshift(orderObj);
+    localStorage.setItem('clayPotOrders', JSON.stringify(existingOrders));
+  } catch {}
+
+  if (!rtdb) {
+    throw new Error('Realtime Database is not initialized');
+  }
+
+  const safeKey = orderObj.orderId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  await rtdb.ref(`${FIREBASE_ORDERS_PATH}/${safeKey}`).set({
+    ...orderObj,
+    status: 'Confirmed',
+    createdAt: Date.now(),
+  });
+}
+
+// Fetch All Orders from Firebase Realtime Database (helpful if Admin Panel runs here or reads window.fetchCloudOrders)
+window.fetchCloudOrders = async function () {
+  if (!rtdb) return [];
+  const snapshot = await rtdb.ref(FIREBASE_ORDERS_PATH).get();
+  if (!snapshot.exists()) return [];
+  const val = snapshot.val();
+  return Object.values(val).sort(
+    (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
+  );
+};
+
 // Customer Orders Helpers
 function getCustomerOrders() {
   try {
@@ -334,13 +392,12 @@ function renderProducts() {
   productGrid.innerHTML = '';
 
   const positionClassMap = {
-    4: 'featured-top-center', // Shahi Doi (Signature Special) -> Top Middle
-    1: 'row-bottom-1', // Mishti Doi (Sora) -> Bottom Left
-    2: 'row-bottom-2', // Mishti Doi (Family Pot) -> Bottom Middle
-    3: 'row-bottom-3', // Tok Doi (Natural) -> Bottom Right
+    4: 'featured-top-center',
+    1: 'row-bottom-1',
+    2: 'row-bottom-2',
+    3: 'row-bottom-3',
   };
 
-  // Display order: Shahi Doi first (top center), then Sora, Family Pot, Tok Doi
   const displayOrderIds = [4, 1, 2, 3];
   const orderedProducts = displayOrderIds
     .map((id) => products.find((p) => p.id === id))
@@ -545,10 +602,10 @@ if (openMenuBtn) openMenuBtn.addEventListener('click', openSideMenu);
 if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeSideMenu);
 if (sideMenuOverlay) sideMenuOverlay.addEventListener('click', closeSideMenu);
 
-// Checkout & Order ID Modal Confirmation with LocalStorage Saving
+// Checkout & Order ID Modal Confirmation with Firebase Realtime Database Saving
 const checkoutForm = document.getElementById('checkoutForm');
 if (checkoutForm) {
-  checkoutForm.addEventListener('submit', function (e) {
+  checkoutForm.addEventListener('submit', async function (e) {
     e.preventDefault();
     if (cart.length === 0) {
       alert(
@@ -566,11 +623,9 @@ if (checkoutForm) {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     const total = subtotal + DELIVERY_FEE;
 
-    // Generate Unique Order ID
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     const orderId = `#TCP-${randomNum}`;
 
-    // Create Order Object
     const newOrder = {
       orderId,
       name,
@@ -584,28 +639,24 @@ if (checkoutForm) {
       date: new Date().toLocaleString(),
     };
 
-    // Save to LocalStorage for Admin Dashboard
-    let existingOrders =
-      JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-    existingOrders.unshift(newOrder);
-    localStorage.setItem('clayPotOrders', JSON.stringify(existingOrders));
+    try {
+      await saveOrderToFirebaseRealtime(newOrder);
+    } catch (err) {
+      console.error('Could not push order to Realtime Database:', err);
+    }
 
-    // Save to Customer My Orders & Order History
     saveCustomerOrder(newOrder);
 
-    // Fill Modal Information
     document.getElementById('modalOrderId').textContent = orderId;
     document.getElementById('modalCustName').textContent = name;
     document.getElementById('modalCustPhone').textContent = phone;
     document.getElementById('modalCustAddress').textContent = address;
     document.getElementById('modalTotalAmount').textContent = `৳${total}`;
 
-    // Close Cart & Open Success Modal
     closeCart();
     document.getElementById('successModal').style.display = 'block';
     document.getElementById('successModalOverlay').style.display = 'block';
 
-    // Clear Cart and Form
     cart = [];
     updateCartUI();
     checkoutForm.reset();

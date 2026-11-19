@@ -91,6 +91,17 @@
         display: none;
         font-weight: 500;
       }
+      .live-sync-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--leaf-green);
+        background: rgba(58, 107, 53, 0.12);
+        padding: 5px 12px;
+        border-radius: 999px;
+      }
     </style>
   </head>
   <body style="padding: 40px 20px">
@@ -167,7 +178,14 @@
           gap: 15px;
         "
       >
-        <h2>🛡️ E-Commerce Management Dashboard</h2>
+        <div
+          style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap"
+        >
+          <h2>🛡️ E-Commerce Management Dashboard</h2>
+          <span class="live-sync-pill" id="cloudSyncStatus"
+            >● Realtime Cloud Sync</span
+          >
+        </div>
         <div>
           <button
             onclick="adminLogout()"
@@ -281,10 +299,41 @@
       </div>
     </div>
 
+    <!-- Firebase Compat SDKs for Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
     <script>
       const ADMIN_GMAIL = 'yeamin@gmail.com';
       const ADMIN_PASS = 'admin1234';
       const ADMIN_PIN = '262149';
+      const FIREBASE_ORDERS_PATH = 'clayPotOrders';
+
+      const firebaseConfig = {
+        apiKey: 'AIzaSyDucXr5F3nd5rmSUGz-EwsxpB2e9517k_Q',
+        authDomain: 'the-clay-pot.firebaseapp.com',
+        databaseURL: 'https://the-clay-pot-default-rtdb.firebaseio.com',
+        projectId: 'the-clay-pot',
+        storageBucket: 'the-clay-pot.firebasestorage.app',
+        messagingSenderId: '218391329107',
+        appId: '1:218391329107:web:633e54ae86e84e129389a6',
+        measurementId: 'G-D9Z287BQR5',
+      };
+
+      let rtdb = null;
+      let currentOrdersList = [];
+      let isRealtimeListenerAttached = false;
+
+      try {
+        if (typeof firebase !== 'undefined') {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          rtdb = firebase.database();
+        }
+      } catch (err) {
+        console.error('Firebase init error in admin:', err);
+      }
 
       window.addEventListener('DOMContentLoaded', function () {
         const savedTheme = localStorage.getItem('theme') || 'light';
@@ -302,7 +351,7 @@
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('adminDashboardContent').style.display =
           'block';
-        loadAdminDashboard();
+        startRealtimeOrdersListener();
       }
 
       document
@@ -335,8 +384,76 @@
         location.reload();
       }
 
-      function loadAdminDashboard() {
-        const orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+      function normalizeOrdersFromSnapshot(snapshotVal) {
+        if (!snapshotVal || typeof snapshotVal !== 'object') return [];
+
+        const list = Object.entries(snapshotVal).map(([fbKey, data]) => {
+          const item = data || {};
+          return {
+            _fbKey: fbKey,
+            orderId: item.orderId || fbKey,
+            name: item.name || 'N/A',
+            phone: item.phone || 'N/A',
+            address: item.address || 'N/A',
+            items: Array.isArray(item.items) ? item.items : [],
+            total: Number(item.total || 0),
+            status: item.status || 'Pending',
+            date: item.date || 'Recent',
+            createdAt: Number(item.createdAt || 0),
+          };
+        });
+
+        return list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      }
+
+      function startRealtimeOrdersListener() {
+        const syncBadge = document.getElementById('cloudSyncStatus');
+
+        if (!rtdb) {
+          if (syncBadge) syncBadge.textContent = '● Local Mode';
+          const localOrders =
+            JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+          renderAdminOrdersTable(
+            localOrders.map((o, idx) => ({
+              ...o,
+              _fbKey: (o.orderId || `local_${idx}`).replace(
+                /[^a-zA-Z0-9_-]/g,
+                '_'
+              ),
+            }))
+          );
+          return;
+        }
+
+        if (isRealtimeListenerAttached) {
+          renderAdminOrdersTable(currentOrdersList);
+          return;
+        }
+        isRealtimeListenerAttached = true;
+
+        rtdb.ref(FIREBASE_ORDERS_PATH).on(
+          'value',
+          (snapshot) => {
+            if (syncBadge) syncBadge.textContent = '● Live Firebase Sync';
+            const orders = normalizeOrdersFromSnapshot(snapshot.val());
+            currentOrdersList = orders;
+            try {
+              localStorage.setItem('clayPotOrders', JSON.stringify(orders));
+            } catch {}
+            renderAdminOrdersTable(orders);
+          },
+          (error) => {
+            console.error('Realtime Database read error:', error);
+            if (syncBadge) syncBadge.textContent = '● Offline / Local Fallback';
+            const localOrders =
+              JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+            currentOrdersList = localOrders;
+            renderAdminOrdersTable(localOrders);
+          }
+        );
+      }
+
+      function renderAdminOrdersTable(orders) {
         const tbody = document.getElementById('orderHistoryList');
         const noOrdersMsg = document.getElementById('noOrdersMsg');
 
@@ -366,12 +483,16 @@
           noOrdersMsg.style.display = 'none';
         }
 
-        orders.forEach((order, index) => {
+        orders.forEach((order) => {
           const tr = document.createElement('tr');
           tr.style.borderBottom = '1px solid var(--border)';
           tr.style.fontSize = '0.9rem';
 
-          const itemsText = order.items
+          const fbKey =
+            order._fbKey ||
+            String(order.orderId || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+          const itemsText = (order.items || [])
             .map((i) => `${i.name} (x${i.qty})`)
             .join(', ');
           const currentStatus = order.status || 'Pending';
@@ -397,7 +518,7 @@
           <td style="padding: 14px; color: var(--text-muted); max-width: 250px;">${itemsText}</td>
           <td style="padding: 14px; font-weight: bold;">৳${order.total}</td>
           <td style="padding: 14px;">
-            <select onchange="updateOrderStatus(${index}, this.value)" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-cream); color: var(--espresso); font-size: 0.85rem;">
+            <select onchange="updateOrderStatus('${fbKey}', this.value)" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-cream); color: var(--espresso); font-size: 0.85rem;">
               <option value="Pending" ${
                 currentStatus === 'Pending' ? 'selected' : ''
               }>Pending</option>
@@ -416,20 +537,33 @@
             <button onclick="printInvoice('${
               order.orderId
             }')" style="background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-right: 4px;" title="Print Invoice">🖨️</button>
-            <button onclick="deleteOrder(${index})" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;" title="Delete">🗑️</button>
+            <button onclick="deleteOrder('${fbKey}')" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;" title="Delete">🗑️</button>
           </td>
         `;
           tbody.appendChild(tr);
         });
+
+        filterOrders();
       }
 
-      function updateOrderStatus(index, newStatus) {
-        let orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-        if (orders[index]) {
-          orders[index].status = newStatus;
-          localStorage.setItem('clayPotOrders', JSON.stringify(orders));
-          loadAdminDashboard();
+      async function updateOrderStatus(fbKey, newStatus) {
+        if (rtdb && fbKey) {
+          try {
+            await rtdb
+              .ref(`${FIREBASE_ORDERS_PATH}/${fbKey}/status`)
+              .set(newStatus);
+            return;
+          } catch (err) {
+            console.error('Status update failed on Firebase:', err);
+          }
         }
+
+        const updated = currentOrdersList.map((o) =>
+          o._fbKey === fbKey ? { ...o, status: newStatus } : o
+        );
+        currentOrdersList = updated;
+        localStorage.setItem('clayPotOrders', JSON.stringify(updated));
+        renderAdminOrdersTable(updated);
       }
 
       function filterOrders() {
@@ -446,29 +580,49 @@
         }
       }
 
-      function deleteOrder(index) {
-        if (confirm('Are you sure you want to delete this order?')) {
-          let orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-          orders.splice(index, 1);
-          localStorage.setItem('clayPotOrders', JSON.stringify(orders));
-          loadAdminDashboard();
+      async function deleteOrder(fbKey) {
+        if (!confirm('Are you sure you want to delete this order?')) return;
+
+        if (rtdb && fbKey) {
+          try {
+            await rtdb.ref(`${FIREBASE_ORDERS_PATH}/${fbKey}`).remove();
+            return;
+          } catch (err) {
+            console.error('Delete failed on Firebase:', err);
+          }
         }
+
+        const filtered = currentOrdersList.filter((o) => o._fbKey !== fbKey);
+        currentOrdersList = filtered;
+        localStorage.setItem('clayPotOrders', JSON.stringify(filtered));
+        renderAdminOrdersTable(filtered);
       }
 
-      function clearAllOrders() {
+      async function clearAllOrders() {
         if (
-          confirm(
+          !confirm(
             'Warning! This will delete all order histories. Are you sure?'
           )
         ) {
-          localStorage.removeItem('clayPotOrders');
-          loadAdminDashboard();
+          return;
         }
+
+        if (rtdb) {
+          try {
+            await rtdb.ref(FIREBASE_ORDERS_PATH).remove();
+            return;
+          } catch (err) {
+            console.error('Clear all failed on Firebase:', err);
+          }
+        }
+
+        currentOrdersList = [];
+        localStorage.removeItem('clayPotOrders');
+        renderAdminOrdersTable([]);
       }
 
       function printInvoice(orderId) {
-        const orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-        const order = orders.find((o) => o.orderId === orderId);
+        const order = currentOrdersList.find((o) => o.orderId === orderId);
         if (!order) return;
 
         const printWindow = window.open('', '_blank', 'width=800,height=600');
@@ -504,7 +658,7 @@
                 <th>Item Name</th>
                 <th>Quantity</th>
               </tr>
-              ${order.items
+              ${(order.items || [])
                 .map(
                   (item) => `<tr><td>${item.name}</td><td>${item.qty}</td></tr>`
                 )
