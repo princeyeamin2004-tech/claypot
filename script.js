@@ -1,100 +1,160 @@
 // WhatsApp & Delivery Configuration
 const WHATSAPP_NUMBER = '8801898497847';
 const DELIVERY_FEE = 60;
+const CUSTOMER_ORDERS_KEY = 'clayPotCustomerOrders';
 
 // Translations Dictionary (English & Bengali)
 const translations = {
   en: {
-    cartText: "Cart",
-    menuTitle: "Navigation Menu",
-    navHome: "🏠 Home",
-    navMenu: "🍯 Our Menu & Collection",
-    navStory: "📖 Our Story & Craft",
-    navPayment: "💳 Payment & bKash Info",
-    navDelivery: "🚚 Delivery Areas & Charges",
-    navContact: "📞 Contact & WhatsApp",
-    badge: "Authentic Bogra Heritage",
-    heroTitle: "Rooted in Tradition,<br />Crafted in Clay.",
-    heroDesc: "Slow-baked creamy Mishti Doi set in unglazed terracotta pots for that unmistakable earthy aroma and caramelized malai crust—delivered fresh across Dhaka.",
-    orderNowBtn: "Order Now",
-    exploreBtn: "Explore Our Craft",
-    collTitle: "Our Signature Collection",
-    collDesc: "Prepared fresh in small batches using pure cow milk and traditional clay vessels.",
-    soilTitle: "Rooted in Bogra's Soil",
-    soilDesc: "Discover why our traditional preparation makes all the difference.",
-    feat1Title: "Unglazed Terracotta",
-    feat1Desc: "Breathable clay pots naturally absorb excess moisture, creating a thick, velvety texture and rich aroma.",
-    feat2Title: "100% Pure Milk",
-    feat2Desc: "Slow-simmered to perfection without artificial thickeners or preservatives—just pure, traditional taste.",
-    feat3Title: "Fresh Batch Delivery",
-    feat3Desc: "Carefully packed and delivered chilled to your doorstep in Mohammadpur, Dhanmondi, and surrounding areas.",
-    payTitle: "💳 Easy Payment Methods",
-    payDesc: "You can pay securely via <strong>bKash, Nagad, Rocket</strong> or choose <strong>Cash on Delivery (COD)</strong> when your fresh batch arrives at your doorstep in Dhaka.",
-    delTitle: "🚚 Delivery & Coverage",
-    delDesc: "We deliver across <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka zones. Standard delivery charge is flat ৳60.",
-    footerSub: "Rooted in Tradition, Crafted in Clay.",
-    footerNote: "Dhaka Delivery Hotline / WhatsApp Support Available.",
-    waChat: "WhatsApp Chat",
-    fbPage: "Facebook Page",
-    basketTitle: "Your Order Basket",
-    emptyCartMsg: "Your basket is empty.",
-    subtotalText: "Subtotal",
-    deliveryText: "Dhaka Delivery",
-    totalText: "Total Payable",
-    deliveryDetailsTitle: "Delivery Details",
-    namePh: "Full Name",
-    phonePh: "Phone Number (e.g., 017XXXXXXXX)",
-    addressPh: "Full Address in Dhaka (House, Road, Area)",
-    confirmOrderBtn: "Confirm Order Now",
-    addToCartBtn: "+ Add to Basket"
+    cartText: 'Cart',
+    menuTitle: 'Navigation Menu',
+    navHome: '🏠 Home',
+    catShopOrders: '🛍️ Shop & Orders',
+    navMenu: '🍯 Our Menu & Collection',
+    navMyOrders: '📦 My Orders',
+    catOrderDelivery: '🚚 Order & Delivery Info',
+    navPayment: '💳 Payment Info',
+    navDelivery: '📍 Delivery Areas & Charges',
+    navHistory: '📜 History',
+    catSupport: '🎧 Support',
+    navContact: '📞 Contact & WhatsApp',
+    navFacebook: '📘 Facebook',
+    navInstagram: '📸 Instagram',
+    settingsText: 'Settings',
+    catAboutBrand: '🏷️ About The Brand',
+    navStory: '📖 Our Story & Craft',
+    badge: 'Authentic Bogura Heritage',
+    heroTitle: 'Rooted in Tradition,<br />Crafted in Clay.',
+    heroDesc:
+      'Slow-baked creamy Mishti Doi set in unglazed terracotta pots for that unmistakable earthy aroma and caramelized malai crust—delivered fresh across Dhaka.',
+    orderNowBtn: 'Order Now',
+    exploreBtn: 'Explore Our Craft',
+    collTitle: 'Our Signature Collection',
+    collDesc:
+      'Prepared fresh in small batches using pure cow milk and traditional clay vessels.',
+    soilTitle: "Rooted in Bogura's Soil",
+    soilDesc:
+      'Discover why our traditional preparation makes all the difference.',
+    feat1Title: 'Unglazed Terracotta',
+    feat1Desc:
+      'Breathable clay pots naturally absorb excess moisture, creating a thick, velvety texture and rich aroma.',
+    feat2Title: '100% Pure Milk',
+    feat2Desc:
+      'Slow-simmered to perfection without artificial thickeners or preservatives—just pure, traditional taste.',
+    feat3Title: 'Fresh Batch Delivery',
+    feat3Desc:
+      'Carefully packed and delivered chilled to your doorstep in Mohammadpur, Dhanmondi, and surrounding areas.',
+    payTitle: '💳 Easy Payment Methods',
+    payDesc:
+      'You can pay securely via <strong>bKash, Nagad, Rocket</strong> or choose <strong>Cash on Delivery (COD)</strong> when your fresh batch arrives at your doorstep in Dhaka.',
+    delTitle: '🚚 Delivery & Coverage',
+    delDesc:
+      'We deliver across <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka zones. Standard delivery charge is flat ৳60.',
+    footerSub: 'Rooted in Tradition, Crafted in Clay.',
+    footerNote: 'Dhaka Delivery Hotline / WhatsApp Support Available.',
+    waChat: 'WhatsApp Chat',
+    fbPage: 'Facebook Page',
+    basketTitle: 'Your Order Basket',
+    emptyCartMsg: 'Your basket is empty.',
+    subtotalText: 'Subtotal',
+    deliveryText: 'Dhaka Delivery',
+    totalText: 'Total Payable',
+    deliveryDetailsTitle: 'Delivery Details',
+    namePh: 'Full Name',
+    phonePh: 'Phone Number (e.g., 017XXXXXXXX)',
+    addressPh: 'Full Address in Dhaka (House, Road, Area)',
+    confirmOrderBtn: 'Confirm Order Now',
+    addToCartBtn: '+ Add to Basket',
+    myOrdersTitle: '📦 My Orders',
+    historyTitle: '📜 Order History',
+    noActiveOrders: 'No recent order found yet.',
+    noHistoryOrders: 'No past order history found yet.',
+    latestConfirmMsg:
+      'Confirmation: Your order has been received and saved for quick reference.',
+    clearHistoryBtn: 'Clear History',
+    orderIdLabel: 'Order ID',
+    dateLabel: 'Time',
+    itemsLabel: 'Items',
+    totalLabel: 'Total',
+    addressLabel: 'Address',
+    statusConfirmed: 'Confirmed',
   },
   bn: {
-    cartText: "কার্ট",
-    menuTitle: "নেভিগেশন মেনু",
-    navHome: "🏠 হোম",
-    navMenu: "🍯 আমাদের মেনু ও কালেকশন",
-    navStory: "📖 আমাদের গল্প ও ঐতিহ্য",
-    navPayment: "💳 পেমেন্ট ও বিকাশ তথ্য",
-    navDelivery: "🚚 ডেলিভারি এলাকা ও চার্জ",
-    navContact: "📞 যোগাযোগ ও হোয়াটসঅ্যাপ",
-    badge: "খাঁটি বগুড়ার ঐতিহ্য",
-    heroTitle: "ঐতিহ্যের শিকড়ে,<br />মাটির তৈরি দই।",
-    heroDesc: "অগভীর মাটির পাত্রে ধীরে ধীরে বেক করা সুস্বাদু ও মালাইদার মিষ্টি দই—যা ঢাকা শহরের যেকোনো প্রান্তে পৌঁছে দেওয়া হয় টাটকা।",
-    orderNowBtn: "এখনই অর্ডার করুন",
-    exploreBtn: "আমাদের ঐতিহ্য জানুন",
-    collTitle: "আমাদের সিগনেচার কালেকশন",
-    collDesc: "বিশুদ্ধ গরুর দুধ ও ঐতিহ্যবাহী মাটির পাত্রে ছোট ব্যাচে প্রতিদিন তৈরি।",
-    soilTitle: "বগুড়ার মাটির ছোঁয়া",
-    soilDesc: "জেনে নিন কেন আমাদের ঐতিহ্যবাহী প্রণালী সবার চেয়ে আলাদা।",
-    feat1Title: "অগভীর পোড়ামাটির পাত্র",
-    feat1Desc: "প্রাকৃতিক মাটির পাত্র অতিরিক্ত আর্দ্রতা শোষণ করে দইকে করে তোলে ঘন, তুলতুলে ও সুবাসিত।",
-    feat2Title: "১০০% খাঁটি দুধ",
-    feat2Desc: "কোনো কৃত্রিম উপাদান বা প্রিজার্ভেটিভ ছাড়া নিখাদ ও ঐতিহ্যবাহী স্বাদের সমাহার।",
-    feat3Title: "তাজা ও দ্রুত হোম ডেলিভারি",
-    feat3Desc: "মোহাম্মদপুর, ধানমন্ডি এবং আশেপাশের এলাকায় একদম ঠাণ্ডা ও সতেজ অবস্থায় হোম ডেলিভারি।",
-    payTitle: "💳 সহজ পেমেন্ট পদ্ধতি",
-    payDesc: "বিকাশ, নগদ, রকেটের মাধ্যমে পেমেন্ট করতে পারেন অথবা ঢাকায় ক্যাশ অন ডেলিভারি (COD) বেছে নিতে পারেন।",
-    delTitle: "🚚 ডেলিভারি ও কভারেজ",
-    delDesc: "মোহাম্মদপুর, ধানমন্ডি, লালমাটিয়া এবং এর আশপাশে ডেলিভারি করা হয়। ডেলিভারি চার্জ মাত্র ৳৬০ ফ্ল্যাট।",
-    footerSub: "ঐতিহ্যের শেড়ে, মাটির ছোঁয়া।",
-    footerNote: "ঢাকা ডেলিভারি হটলাইন / হোয়াটসঅ্যাপ সাপোর্ট চালু আছে।",
-    waChat: "হোয়াটসঅ্যাপ চ্যাট",
-    fbPage: "ফেসবুক পেজ",
-    basketTitle: "আপনার অর্ডার কার্ট",
-    emptyCartMsg: "আপনার কার্টটি বর্তমানে খালি।",
-    subtotalText: "সাবটোটাল",
-    deliveryText: "ঢাকা ডেলিভারি",
-    totalText: "সর্বমোট প্রদেয়",
-    deliveryDetailsTitle: "ডেলিভারির বিবরণ",
-    namePh: "সম্পূর্ণ নাম",
-    phonePh: "মোবাইল নম্বর (যেমন: 017XXXXXXXX)",
-    addressPh: "পূর্ণ ঠিকানা (বাসা, রোড, এলাকা)",
-    confirmOrderBtn: "এখনই অর্ডার কনফার্ম করুন",
-    addToCartBtn: "+ কার্টে যোগ করুন"
-  }
+    cartText: 'কার্ট',
+    menuTitle: 'নেভিগেশন মেনু',
+    navHome: '🏠 হোম',
+    catShopOrders: '🛍️ শপ ও অর্ডারস',
+    navMenu: '🍯 আওয়ার মেনু ও কালেকশন',
+    navMyOrders: '📦 মাই অর্ডারস',
+    catOrderDelivery: '🚚 অর্ডার ও ডেলিভারি তথ্য',
+    navPayment: '💳 পেমেন্ট তথ্য',
+    navDelivery: '📍 ডেলিভারি এরিয়া ও চার্জ',
+    navHistory: '📜 হিস্ট্রি',
+    catSupport: '🎧 সাপোর্ট',
+    navContact: '📞 কন্টাক্ট ও হোয়াটসঅ্যাপ',
+    navFacebook: '📘 ফেসবুক',
+    navInstagram: '📸 ইনস্টাগ্রাম',
+    settingsText: 'সেটিংস',
+    catAboutBrand: '🏷️ ব্র্যান্ড পরিচিতি',
+    navStory: '📖 আওয়ার স্টোরি ও ক্রাফট',
+    badge: 'খাঁটি বগুড়ার ঐতিহ্য',
+    heroTitle: 'ঐতিহ্যের শিকড়ে,<br />মাটির তৈরি দই।',
+    heroDesc:
+      'অগভীর মাটির পাত্রে ধীরে ধীরে বেক করা সুস্বাদু ও মালাইদার মিষ্টি দই—যা ঢাকা শহরের যেকোনো প্রান্তে পৌঁছে দেওয়া হয় টাটকা।',
+    orderNowBtn: 'এখনই অর্ডার করুন',
+    exploreBtn: 'আমাদের ঐতিহ্য জানুন',
+    collTitle: 'আমাদের সিগনেচার কালেকশন',
+    collDesc:
+      'বিশুদ্ধ গরুর দুধ ও ঐতিহ্যবাহী মাটির পাত্রে ছোট ব্যাচে প্রতিদিন তৈরি।',
+    soilTitle: 'বগুড়ার মাটির ছোঁয়া',
+    soilDesc: 'জেনে নিন কেন আমাদের ঐতিহ্যবাহী প্রণালী সবার চেয়ে আলাদা।',
+    feat1Title: 'অগভীর পোড়ামাটির পাত্র',
+    feat1Desc:
+      'প্রাকৃতিক মাটির পাত্র অতিরিক্ত আর্দ্রতা শোষণ করে দইকে করে তোলে ঘন, তুলতুলে ও সুবাসিত।',
+    feat2Title: '১০০% খাঁটি দুধ',
+    feat2Desc:
+      'কোনো কৃত্রিম উপাদান বা প্রিজার্ভেটিভ ছাড়া নিখাদ ও ঐতিহ্যবাহী স্বাদের সমাহার।',
+    feat3Title: 'তাজা ও দ্রুত হোম ডেলিভারি',
+    feat3Desc:
+      'মোহাম্মদপুর, ধানমন্ডি এবং আশেপাশের এলাকায় একদম ঠাণ্ডা ও সতেজ অবস্থায় হোম ডেলিভারি।',
+    payTitle: '💳 সহজ পেমেন্ট পদ্ধতি',
+    payDesc:
+      'বিকাশ, নগদ, রকেটের মাধ্যমে পেমেন্ট করতে পারেন অথবা ঢাকায় ক্যাশ অন ডেলিভারি (COD) বেছে নিতে পারেন।',
+    delTitle: '🚚 ডেলিভারি ও কভারেজ',
+    delDesc:
+      'মোহাম্মদপুর, ধানমন্ডি, লালমাটিয়া এবং এর আশপাশে ডেলিভারি করা হয়। ডেলিভারি চার্জ মাত্র ৳৬০ ফ্ল্যাট।',
+    footerSub: 'ঐতিহ্যের শিকড়ে, মাটির ছোঁয়া।',
+    footerNote: 'ঢাকা ডেলিভারি হটলাইন / হোয়াটসঅ্যাপ সাপোর্ট চালু আছে।',
+    waChat: 'হোয়াটসঅ্যাপ চ্যাট',
+    fbPage: 'ফেসবুক পেজ',
+    basketTitle: 'আপনার অর্ডার কার্ট',
+    emptyCartMsg: 'আপনার কার্টটি বর্তমানে খালি।',
+    subtotalText: 'সাবটোটাল',
+    deliveryText: 'ঢাকা ডেলিভারি',
+    totalText: 'সর্বমোট প্রদেয়',
+    deliveryDetailsTitle: 'ডেলিভারির বিবরণ',
+    namePh: 'সম্পূর্ণ নাম',
+    phonePh: 'মোবাইল নম্বর (যেমন: 017XXXXXXXX)',
+    addressPh: 'পূর্ণ ঠিকানা (বাসা, রোড, এলাকা)',
+    confirmOrderBtn: 'এখনই অর্ডার কনফার্ম করুন',
+    addToCartBtn: '+ কার্টে যোগ করুন',
+    myOrdersTitle: '📦 মাই অর্ডারস',
+    historyTitle: '📜 অর্ডার হিস্ট্রি',
+    noActiveOrders: 'এখনো কোনো সাম্প্রতিক অর্ডার নেই।',
+    noHistoryOrders: 'আগের কোনো অর্ডার হিস্ট্রি পাওয়া যায়নি।',
+    latestConfirmMsg:
+      'কনফার্মেশন: আপনার অর্ডারটি গ্রহণ করা হয়েছে এবং সহজে দেখার জন্য সংরক্ষণ করা হয়েছে।',
+    clearHistoryBtn: 'হিস্ট্রি মুছুন',
+    orderIdLabel: 'অর্ডার আইডি',
+    dateLabel: 'সময়',
+    itemsLabel: 'পণ্যসমূহ',
+    totalLabel: 'মোট বিল',
+    addressLabel: 'ঠিকানা',
+    statusConfirmed: 'কনফার্মড',
+  },
 };
 
-let currentLang = 'en';
+let currentLang = localStorage.getItem('lang') === 'bn' ? 'bn' : 'en';
 
 // Product Catalog with ImgBB Direct Image Links
 const products = [
@@ -105,8 +165,10 @@ const products = [
     weightEn: '600g Clay Sora',
     weightBn: '৬০০ গ্রাম সরা',
     price: 310,
-    descEn: 'Traditional Bogra mishti doi set in an unglazed clay sora with a delicious caramelized malai crust.',
-    descBn: 'ঐতিহ্যবাহী অগভীর মাটির সরায় তৈরি খাঁটি বগুড়ার মিষ্টি দই। ওপরের অংশে থাকে লোভনীয় ক্যারামেল মালাইয়ের আস্তর।',
+    descEn:
+      'Traditional Bogura mishti doi set in an unglazed clay sora with a delicious caramelized malai crust.',
+    descBn:
+      'ঐতিহ্যবাহী অগভীর মাটির সরায় তৈরি খাঁটি বগুড়ার মিষ্টি দই। ওপরের অংশে থাকে লোভনীয় ক্যারামেল মালাইয়ের আস্তর।',
     image: 'https://i.ibb.co.com/bM8KtfKL/mishti-doi-600-jpg.jpg',
   },
   {
@@ -116,8 +178,10 @@ const products = [
     weightEn: '800g Family Pot',
     weightBn: '৮০০ গ্রাম ফ্যামিলি পট',
     price: 410,
-    descEn: 'Large 800g clay pot pack ideal for family gatherings and guests. Rich milk cream and sweetness.',
-    descBn: 'বড় পরিবার বা অতিথি আপ্যায়নের জন্য ৮০০ গ্রামের বিশেষ মাটির হাঁড়ি প্যাক। খাঁটি দুধের সর ও সুমিষ্ট স্বাদ।',
+    descEn:
+      'Large 800g clay pot pack ideal for family gatherings and guests. Rich milk cream and sweetness.',
+    descBn:
+      'বড় পরিবার বা অতিথি আপ্যায়নের জন্য ৮০০ গ্রামের বিশেষ মাটির হাঁড়ি প্যাক। খাঁটি দুধের সর ও সুমিষ্ট স্বাদ।',
     image: 'https://i.ibb.co.com/jk3n8kPp/mishti-doi-pot-800-jpg.jpg',
   },
   {
@@ -127,8 +191,10 @@ const products = [
     weightEn: '800g Natural Pot',
     weightBn: '৮০০ গ্রাম প্রাকৃতিক দই',
     price: 290,
-    descEn: '100% pure and fresh sour yogurt set in earthenware, perfect for borhani, raita, or daily diet.',
-    descBn: 'বোরহানি, রায়তা বা স্বাস্থ্যসচেতনদের প্রতিদিনের ডায়েটের জন্য ১০০% খাঁটি ও সতেজ টক দই।',
+    descEn:
+      '100% pure and fresh sour yogurt set in earthenware, perfect for borhani, raita, or daily diet.',
+    descBn:
+      'বোরহানি, রায়তা বা স্বাস্থ্যসচেতনদের প্রতিদিনের ডায়েটের জন্য ১০০% খাঁটি ও সতেজ টক দই।',
     image: 'https://i.ibb.co.com/M0zMLTq/tok-doi-800-jpg.jpg',
   },
   {
@@ -138,28 +204,157 @@ const products = [
     weightEn: '600g Premium Pot',
     weightBn: '৬০০ গ্রাম প্রিমিয়াম পট (Signature Special)',
     price: 460,
-    descEn: 'Our premium signature item loaded with thick kheer, caramel glaze, and rich nut toppings.',
-    descBn: 'আমাদের প্রিমিয়াম ও রাজকীয় সিগনেচার আইটেম। ঘন ক্ষীর, ক্যারামেল গ্লেজ এবং বাদামের টপিংয়ে ভরপুর অতুলনীয় স্বাদ।',
+    descEn:
+      'Our premium signature item loaded with thick kheer, caramel glaze, and rich nut toppings.',
+    descBn:
+      'আমাদের প্রিমিয়াম ও রাজকীয় সিগনেচার আইটেম। ঘন ক্ষীর, ক্যারামেল গ্লেজ এবং বাদামের টপিংয়ে ভরপুর অতুলনীয় স্বাদ।',
     image: 'https://i.ibb.co.com/V0YKxG87/shahi-doi-600-jpg.jpg',
   },
 ];
 
 let cart = [];
 
-// Render Menu Products
+// Customer Orders Helpers
+function getCustomerOrders() {
+  try {
+    return JSON.parse(localStorage.getItem(CUSTOMER_ORDERS_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomerOrder(orderObj) {
+  const list = getCustomerOrders();
+  list.unshift(orderObj);
+  localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.stringify(list));
+  updateCustomerOrderBadges();
+}
+
+function clearCustomerOrdersHistory() {
+  localStorage.removeItem(CUSTOMER_ORDERS_KEY);
+  updateCustomerOrderBadges();
+  const titleEl = document.getElementById('customerOrdersTitle');
+  const bodyEl = document.getElementById('customerOrdersBody');
+  if (titleEl && bodyEl) {
+    renderCustomerOrdersView('history', titleEl, bodyEl, currentLang);
+  }
+}
+
+function updateCustomerOrderBadges() {
+  const orders = getCustomerOrders();
+  const activeCountEl = document.getElementById('activeOrdersCount');
+  const historyCountEl = document.getElementById('historyOrdersCount');
+
+  if (activeCountEl) {
+    activeCountEl.textContent = orders.length > 0 ? '1' : '0';
+  }
+  if (historyCountEl) {
+    historyCountEl.textContent = String(orders.length);
+  }
+}
+
+function formatOrderItemsText(items) {
+  if (!Array.isArray(items) || items.length === 0) return '-';
+  return items.map((i) => `${i.name} × ${i.qty}`).join(', ');
+}
+
+function renderOrderCardHtml(order, t, isLatest = false) {
+  return `
+    <div class="order-record-card">
+      <div class="order-record-top">
+        <strong style="color: var(--terracotta);">${t.orderIdLabel}: ${
+    order.orderId
+  }</strong>
+        <span class="order-status-badge">${t.statusConfirmed}</span>
+      </div>
+      ${
+        isLatest
+          ? `<p style="font-size: 0.84rem; color: var(--espresso); background: var(--surface); padding: 8px 10px; border-radius: 8px; border: 1px dashed var(--border); margin-bottom: 8px;">${t.latestConfirmMsg}</p>`
+          : ''
+      }
+      <p style="margin-bottom: 4px;"><strong>${
+        t.itemsLabel
+      }:</strong> ${formatOrderItemsText(order.items)}</p>
+      <p style="margin-bottom: 4px;"><strong>${t.totalLabel}:</strong> ৳${
+    order.total
+  }</p>
+      <p style="margin-bottom: 4px;"><strong>${t.addressLabel}:</strong> ${
+    order.address
+  }</p>
+      <p style="font-size: 0.8rem; color: var(--text-muted);"><strong>${
+        t.dateLabel
+      }:</strong> ${order.date}</p>
+    </div>
+  `;
+}
+
+// Exposed to index.html modal opener
+window.renderCustomerOrdersView = function (mode, titleEl, bodyEl, lang) {
+  const activeLang = lang || currentLang;
+  const t = translations[activeLang] || translations.en;
+  const orders = getCustomerOrders();
+
+  if (mode === 'history') {
+    titleEl.textContent = t.historyTitle;
+    if (orders.length === 0) {
+      bodyEl.innerHTML = `<p style="color: var(--text-muted);">${t.noHistoryOrders}</p>`;
+      return;
+    }
+
+    const cardsHtml = orders
+      .map((ord) => renderOrderCardHtml(ord, t, false))
+      .join('');
+
+    bodyEl.innerHTML = `
+      ${cardsHtml}
+      <button
+        type="button"
+        class="btn-secondary full-width"
+        style="margin-top: 8px;"
+        onclick="clearCustomerOrdersHistory()"
+      >
+        ${t.clearHistoryBtn}
+      </button>
+    `;
+  } else {
+    titleEl.textContent = t.myOrdersTitle;
+    if (orders.length === 0) {
+      bodyEl.innerHTML = `<p style="color: var(--text-muted);">${t.noActiveOrders}</p>`;
+      return;
+    }
+
+    bodyEl.innerHTML = renderOrderCardHtml(orders[0], t, true);
+  }
+};
+
+// Render Menu Products with Shahi Doi Top-Center & 3 Core Items Below
 function renderProducts() {
   const productGrid = document.getElementById('productGrid');
   if (!productGrid) return;
   productGrid.innerHTML = '';
 
-  products.forEach((product) => {
+  const positionClassMap = {
+    4: 'featured-top-center', // Shahi Doi (Signature Special) -> Top Middle
+    1: 'row-bottom-1', // Mishti Doi (Sora) -> Bottom Left
+    2: 'row-bottom-2', // Mishti Doi (Family Pot) -> Bottom Middle
+    3: 'row-bottom-3', // Tok Doi (Natural) -> Bottom Right
+  };
+
+  // Display order: Shahi Doi first (top center), then Sora, Family Pot, Tok Doi
+  const displayOrderIds = [4, 1, 2, 3];
+  const orderedProducts = displayOrderIds
+    .map((id) => products.find((p) => p.id === id))
+    .filter(Boolean);
+
+  orderedProducts.forEach((product) => {
     const name = currentLang === 'bn' ? product.nameBn : product.nameEn;
     const weight = currentLang === 'bn' ? product.weightBn : product.weightEn;
     const desc = currentLang === 'bn' ? product.descBn : product.descEn;
     const btnText = translations[currentLang].addToCartBtn;
+    const posClass = positionClassMap[product.id] || '';
 
     const card = document.createElement('div');
-    card.className = 'product-card';
+    card.className = `product-card ${posClass}`.trim();
     card.innerHTML = `
       <img src="${product.image}" alt="${name}" onerror="this.src='https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'" />
       <div class="product-info">
@@ -181,27 +376,35 @@ function renderProducts() {
 // Language Switcher Function
 function changeLanguage(lang) {
   currentLang = lang;
+  localStorage.setItem('lang', lang);
   const t = translations[lang];
 
-  document.getElementById('enLangBtn').classList.toggle('active', lang === 'en');
-  document.getElementById('bnLangBtn').classList.toggle('active', lang === 'bn');
+  const enBtn = document.getElementById('enLangBtn');
+  const bnBtn = document.getElementById('bnLangBtn');
+  if (enBtn) enBtn.classList.toggle('active', lang === 'en');
+  if (bnBtn) bnBtn.classList.toggle('active', lang === 'bn');
 
-  document.querySelectorAll('[data-translate]').forEach(el => {
+  document.querySelectorAll('[data-translate]').forEach((el) => {
     const key = el.getAttribute('data-translate');
     if (t[key]) {
       el.innerHTML = t[key];
     }
   });
 
-  document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+  document.querySelectorAll('[data-translate-placeholder]').forEach((el) => {
     const key = el.getAttribute('data-translate-placeholder');
     if (t[key]) {
       el.placeholder = t[key];
     }
   });
 
+  if (typeof window.applyPaymentLanguage === 'function') {
+    window.applyPaymentLanguage(lang);
+  }
+
   renderProducts();
   updateCartUI();
+  updateCustomerOrderBadges();
 }
 
 // Dark Mode Toggle Logic
@@ -218,36 +421,17 @@ if (darkModeToggle) {
   });
 }
 
-// Load Saved Theme on Startup
+// Load Saved Theme & Language on Startup
 window.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('theme') || 'light';
   if (savedTheme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
     if (darkModeToggle) darkModeToggle.checked = true;
   }
-  renderProducts();
+
+  changeLanguage(currentLang);
+  updateCustomerOrderBadges();
 });
-
-// Settings Dropdown Toggle
-const settingsToggleBtn = document.getElementById('settingsToggleBtn');
-const settingsDropdown = document.getElementById('settingsDropdown');
-
-if (settingsToggleBtn && settingsDropdown) {
-  settingsToggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    settingsDropdown.classList.toggle('open');
-  });
-
-  window.addEventListener('click', () => {
-    if (settingsDropdown.classList.contains('open')) {
-      settingsDropdown.classList.remove('open');
-    }
-  });
-
-  settingsDropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-}
 
 // Cart Functions
 function addToCart(productId) {
@@ -286,7 +470,8 @@ function updateCartUI() {
 
   if (cartCountEl) cartCountEl.textContent = totalCount;
   if (subtotalText) subtotalText.textContent = `৳${subtotal}`;
-  if (totalText) totalText.textContent = `৳${subtotal > 0 ? subtotal + DELIVERY_FEE : 60}`;
+  if (totalText)
+    totalText.textContent = `৳${subtotal > 0 ? subtotal + DELIVERY_FEE : 60}`;
 
   if (!cartItemsEl) return;
 
@@ -300,8 +485,12 @@ function updateCartUI() {
       (item) => `
       <div class="cart-item">
         <div>
-          <strong>${currentLang === 'bn' ? item.nameBn : item.nameEn}</strong><br />
-          <small>${currentLang === 'bn' ? item.weightBn : item.weightEn} — ৳${item.price * item.qty}</small>
+          <strong>${
+            currentLang === 'bn' ? item.nameBn : item.nameEn
+          }</strong><br />
+          <small>${currentLang === 'bn' ? item.weightBn : item.weightEn} — ৳${
+        item.price * item.qty
+      }</small>
         </div>
         <div class="qty-controls">
           <button onclick="changeQty(${item.id}, -1)">-</button>
@@ -362,7 +551,11 @@ if (checkoutForm) {
   checkoutForm.addEventListener('submit', function (e) {
     e.preventDefault();
     if (cart.length === 0) {
-      alert(currentLang === 'bn' ? 'দয়া করে কার্টে অন্তত একটি পণ্য যোগ করুন।' : 'Please add at least one item to your basket first.');
+      alert(
+        currentLang === 'bn'
+          ? 'দয়া করে কার্টে অন্তত একটি পণ্য যোগ করুন।'
+          : 'Please add at least one item to your basket first.'
+      );
       return;
     }
 
@@ -377,24 +570,28 @@ if (checkoutForm) {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     const orderId = `#TCP-${randomNum}`;
 
-    // Create Order Object for Admin Dashboard
+    // Create Order Object
     const newOrder = {
       orderId,
       name,
       phone,
       address,
-      items: cart.map(item => ({
+      items: cart.map((item) => ({
         name: currentLang === 'bn' ? item.nameBn : item.nameEn,
-        qty: item.qty
+        qty: item.qty,
       })),
       total,
-      date: new Date().toLocaleString()
+      date: new Date().toLocaleString(),
     };
 
     // Save to LocalStorage for Admin Dashboard
-    let existingOrders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+    let existingOrders =
+      JSON.parse(localStorage.getItem('clayPotOrders')) || [];
     existingOrders.unshift(newOrder);
     localStorage.setItem('clayPotOrders', JSON.stringify(existingOrders));
+
+    // Save to Customer My Orders & Order History
+    saveCustomerOrder(newOrder);
 
     // Fill Modal Information
     document.getElementById('modalOrderId').textContent = orderId;

@@ -11,41 +11,104 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <style>
-      .drawer-settings {
-        padding: 14px 20px 20px;
-        border-top: 1px solid var(--border);
-        margin-top: 10px;
+      /* Nested Navigation Categories in Drawer */
+      .drawer-group {
+        border-bottom: 1px solid var(--border);
+        padding: 8px 0;
       }
-      .drawer-settings-trigger {
+      .drawer-group:last-of-type {
+        border-bottom: none;
+      }
+      .drawer-group-trigger {
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         background: transparent;
         border: none;
         color: var(--espresso);
         font-family: inherit;
         font-size: 1rem;
+        font-weight: 600;
+        padding: 9px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+      }
+      .drawer-group-trigger:hover {
+        background: var(--surface-warm, var(--bg-cream));
+        color: var(--terracotta);
+      }
+      .drawer-sublinks {
+        display: none;
+        list-style: none;
+        padding: 4px 0 8px 14px;
+      }
+      .drawer-group.open .drawer-sublinks {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .drawer-sublinks a,
+      .drawer-sublinks button.drawer-sub-btn {
+        width: 100%;
+        text-align: left;
+        text-decoration: none;
+        background: transparent;
+        border: none;
+        font-family: inherit;
+        color: var(--text-muted);
+        font-size: 0.94rem;
         font-weight: 500;
-        padding: 8px 4px;
+        padding: 7px 12px;
+        border-radius: 7px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .drawer-sublinks a:hover,
+      .drawer-sublinks button.drawer-sub-btn:hover {
+        background: var(--bg-cream);
+        color: var(--terracotta);
+      }
+      .order-badge-pill {
+        background: var(--terracotta);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+
+      .drawer-settings {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .drawer-settings-trigger {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        background: transparent;
+        border: none;
+        color: var(--espresso);
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 9px 10px;
+        border-radius: 8px;
         cursor: pointer;
         text-align: left;
       }
       .drawer-settings-trigger:hover {
+        background: var(--surface-warm, var(--bg-cream));
         color: var(--terracotta);
-      }
-      .drawer-settings-arrow {
-        font-size: 0.85rem;
-        transition: transform 0.25s ease;
-        color: var(--text-muted);
-      }
-      .drawer-settings.open .drawer-settings-arrow {
-        transform: rotate(180deg);
       }
       .drawer-settings-panel {
         display: none;
-        padding-top: 12px;
-        margin-top: 6px;
+        padding: 10px 10px 4px;
+        margin-top: 4px;
         border-top: 1px dashed var(--border);
       }
       .drawer-settings.open .drawer-settings-panel {
@@ -135,6 +198,56 @@
         border-color: var(--terracotta);
         color: var(--terracotta);
       }
+
+      /* Customer Orders & History Modal */
+      .customer-orders-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 92%;
+        max-width: 500px;
+        max-height: 82vh;
+        overflow-y: auto;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        z-index: 520;
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25);
+      }
+      .customer-orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+      }
+      .order-record-card {
+        background: var(--bg-cream);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+      }
+      .order-record-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+        flex-wrap: wrap;
+      }
+      .order-status-badge {
+        background: rgba(58, 107, 53, 0.14);
+        color: var(--leaf-green);
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
     </style>
   </head>
   <body>
@@ -156,14 +269,12 @@
 
         <!-- Right Side: Cart + Hamburger Menu -->
         <div class="nav-right">
-          <!-- Cart Button -->
           <button class="cart-btn" id="openCartBtn">
             🛒 <span data-translate="cartText">Cart</span> (<span id="cartCount"
               >0</span
             >)
           </button>
 
-          <!-- Hamburger Menu Button -->
           <button
             class="menu-toggle-btn"
             id="openMenuBtn"
@@ -182,93 +293,196 @@
         <h3 data-translate="menuTitle">Navigation Menu</h3>
         <button class="close-btn" id="closeMenuBtn">&times;</button>
       </div>
-      <ul class="side-menu-links">
-        <li>
-          <a href="#" onclick="closeSideMenu()" data-translate="navHome"
-            >🏠 Home</a
-          >
-        </li>
-        <li>
-          <a href="#menu" onclick="closeSideMenu()" data-translate="navMenu"
-            >🍯 Our Menu & Collection</a
-          >
-        </li>
-        <li>
-          <a
-            href="#heritage"
-            onclick="closeSideMenu()"
-            data-translate="navStory"
-            >📖 Our Story & Craft</a
-          >
-        </li>
-        <li>
-          <a
-            href="#payment-info"
-            onclick="closeSideMenu(); openPaymentDetailsFromMenu();"
-            data-translate="navPayment"
-            >💳 Payment Info</a
-          >
-        </li>
-        <li>
-          <a
-            href="#delivery-info"
-            onclick="closeSideMenu()"
-            data-translate="navDelivery"
-            >🚚 Delivery Areas & Charges</a
-          >
-        </li>
-        <li>
-          <a
-            href="#contact"
-            onclick="closeSideMenu()"
-            data-translate="navContact"
-            >📞 Contact & WhatsApp</a
-          >
-        </li>
-      </ul>
 
-      <!-- Collapsible Settings Option Below Navigation Links -->
-      <div class="drawer-settings" id="drawerSettings">
-        <button
-          type="button"
-          class="drawer-settings-trigger"
-          id="drawerSettingsToggle"
-          aria-expanded="false"
-          aria-controls="drawerSettingsPanel"
-        >
-          <span>⚙️ <span data-translate="settingsText">Settings</span></span>
-          <span class="drawer-settings-arrow" id="drawerSettingsArrow">▼</span>
-        </button>
+      <div class="drawer-nav-body" id="drawerAccordionContainer">
+        <!-- 1. Home -->
+        <div class="drawer-group">
+          <a
+            href="#"
+            class="drawer-group-trigger"
+            style="text-decoration: none"
+            onclick="closeAllDrawerGroups(); closeSideMenu();"
+            data-translate="navHome"
+          >
+            <span>🏠 Home</span>
+          </a>
+        </div>
 
-        <div class="drawer-settings-panel" id="drawerSettingsPanel">
-          <div class="setting-item">
-            <span>🌙 Dark / Light</span>
-            <label class="switch">
-              <input type="checkbox" id="darkModeToggle" />
-              <span class="slider round"></span>
-            </label>
-          </div>
-          <div class="setting-item lang-selector">
-            <span>🌐 Language</span>
-            <div class="lang-btns">
+        <!-- 2. Shop & Orders -->
+        <div class="drawer-group" id="groupShopOrders">
+          <button
+            type="button"
+            class="drawer-group-trigger"
+            onclick="toggleSingleDrawerGroup('groupShopOrders', this)"
+            aria-expanded="false"
+          >
+            <span data-translate="catShopOrders">🛍️ Shop & Orders</span>
+          </button>
+          <ul class="drawer-sublinks">
+            <li>
+              <a href="#menu" onclick="closeSideMenu()" data-translate="navMenu"
+                >🍯 Our Menu & Collection</a
+              >
+            </li>
+            <li>
               <button
                 type="button"
-                onclick="changeLanguage('en')"
-                class="lang-btn active"
-                id="enLangBtn"
+                class="drawer-sub-btn"
+                onclick="closeSideMenu(); openCustomerOrdersModal('active');"
               >
-                EN
+                <span data-translate="navMyOrders">📦 My Orders</span>
+                <span class="order-badge-pill" id="activeOrdersCount">0</span>
               </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 3. Order & Delivery Info -->
+        <div class="drawer-group" id="groupOrderDelivery">
+          <button
+            type="button"
+            class="drawer-group-trigger"
+            onclick="toggleSingleDrawerGroup('groupOrderDelivery', this)"
+            aria-expanded="false"
+          >
+            <span data-translate="catOrderDelivery"
+              >🚚 Order & Delivery Info</span
+            >
+          </button>
+          <ul class="drawer-sublinks">
+            <li>
+              <a
+                href="#payment-info"
+                onclick="closeSideMenu(); openPaymentDetailsFromMenu();"
+                data-translate="navPayment"
+                >💳 Payment Info</a
+              >
+            </li>
+            <li>
+              <a
+                href="#delivery-info"
+                onclick="closeSideMenu()"
+                data-translate="navDelivery"
+                >📍 Delivery Areas & Charges</a
+              >
+            </li>
+            <li>
               <button
                 type="button"
-                onclick="changeLanguage('bn')"
-                class="lang-btn"
-                id="bnLangBtn"
+                class="drawer-sub-btn"
+                onclick="closeSideMenu(); openCustomerOrdersModal('history');"
               >
-                বাংলা
+                <span data-translate="navHistory">📜 History</span>
+                <span class="order-badge-pill" id="historyOrdersCount">0</span>
               </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 4. Support -->
+        <div class="drawer-group" id="groupSupport">
+          <button
+            type="button"
+            class="drawer-group-trigger"
+            onclick="toggleSingleDrawerGroup('groupSupport', this)"
+            aria-expanded="false"
+          >
+            <span data-translate="catSupport">🎧 Support</span>
+          </button>
+          <ul class="drawer-sublinks">
+            <li>
+              <a
+                href="#contact"
+                onclick="closeSideMenu()"
+                data-translate="navContact"
+                >📞 Contact & WhatsApp</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                onclick="closeSideMenu()"
+                data-translate="navFacebook"
+                >📘 Facebook</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                onclick="closeSideMenu()"
+                data-translate="navInstagram"
+                >📸 Instagram</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- 5. Settings -->
+        <div class="drawer-settings" id="drawerSettings">
+          <button
+            type="button"
+            class="drawer-settings-trigger"
+            id="drawerSettingsToggle"
+            aria-expanded="false"
+            aria-controls="drawerSettingsPanel"
+          >
+            <span>⚙️ <span data-translate="settingsText">Settings</span></span>
+          </button>
+
+          <div class="drawer-settings-panel" id="drawerSettingsPanel">
+            <div class="setting-item">
+              <span>🌙 Dark / Light</span>
+              <label class="switch">
+                <input type="checkbox" id="darkModeToggle" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="setting-item lang-selector">
+              <span>🌐 Language</span>
+              <div class="lang-btns">
+                <button
+                  type="button"
+                  onclick="changeLanguage('en')"
+                  class="lang-btn active"
+                  id="enLangBtn"
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onclick="changeLanguage('bn')"
+                  class="lang-btn"
+                  id="bnLangBtn"
+                >
+                  বাংলা
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- 6. About The Brand -->
+        <div class="drawer-group" id="groupAboutBrand">
+          <button
+            type="button"
+            class="drawer-group-trigger"
+            onclick="toggleSingleDrawerGroup('groupAboutBrand', this)"
+            aria-expanded="false"
+          >
+            <span data-translate="catAboutBrand">🏷️ About The Brand</span>
+          </button>
+          <ul class="drawer-sublinks">
+            <li>
+              <a
+                href="#heritage"
+                onclick="closeSideMenu()"
+                data-translate="navStory"
+                >📖 Our Story & Craft</a
+              >
+            </li>
+          </ul>
         </div>
       </div>
     </aside>
@@ -656,10 +870,48 @@
       </div>
     </div>
 
+    <!-- My Orders & Order History Modal -->
+    <div
+      class="cart-overlay"
+      id="customerOrdersOverlay"
+      style="display: none"
+      onclick="closeCustomerOrdersModal()"
+    ></div>
+    <div
+      class="customer-orders-modal"
+      id="customerOrdersModal"
+      style="display: none"
+    >
+      <div class="customer-orders-header">
+        <h3 id="customerOrdersTitle">📦 My Orders</h3>
+        <button
+          type="button"
+          class="close-btn"
+          onclick="closeCustomerOrdersModal()"
+        >
+          &times;
+        </button>
+      </div>
+      <div id="customerOrdersBody"></div>
+    </div>
+
     <script>
       const paymentTranslations = {
         en: {
+          navHome: '🏠 Home',
+          catShopOrders: '🛍️ Shop & Orders',
+          navMenu: '🍯 Our Menu & Collection',
+          navMyOrders: '📦 My Orders',
+          catOrderDelivery: '🚚 Order & Delivery Info',
           navPayment: '💳 Payment Info',
+          navDelivery: '📍 Delivery Areas & Charges',
+          navHistory: '📜 History',
+          catSupport: '🎧 Support',
+          navContact: '📞 Contact & WhatsApp',
+          navFacebook: '📘 Facebook',
+          navInstagram: '📸 Instagram',
+          catAboutBrand: '🏷️ About The Brand',
+          navStory: '📖 Our Story & Craft',
           payClickHint: '▼ Click to view numbers & payment options',
           payHideHint: '▲ Click to hide numbers & payment options',
           bkashLabel: '📱 bKash (Personal)',
@@ -675,7 +927,20 @@
             'Pay in cash to the delivery rider upon receiving your order in Dhaka.',
         },
         bn: {
+          navHome: '🏠 হোম',
+          catShopOrders: '🛍️ শপ ও অর্ডারস',
+          navMenu: '🍯 আওয়ার মেনু ও কালেকশন',
+          navMyOrders: '📦 মাই অর্ডারস',
+          catOrderDelivery: '🚚 অর্ডার ও ডেলিভারি তথ্য',
           navPayment: '💳 পেমেন্ট তথ্য',
+          navDelivery: '📍 ডেলিভারি এরিয়া ও চার্জ',
+          navHistory: '📜 হিস্ট্রি',
+          catSupport: '🎧 সাপোর্ট',
+          navContact: '📞 কন্টাক্ট ও হোয়াটসঅ্যাপ',
+          navFacebook: '📘 ফেসবুক',
+          navInstagram: '📸 ইনস্টাগ্রাম',
+          catAboutBrand: '🏷️ ব্র্যান্ড পরিচিতি',
+          navStory: '📖 আওয়ার স্টোরি ও ক্রাফট',
           payClickHint: '▼ নম্বর ও পেমেন্ট অপশন দেখতে ক্লিক করুন',
           payHideHint: '▲ নম্বর ও পেমেন্ট অপশন লুকাতে ক্লিক করুন',
           bkashLabel: '📱 বিকাশ (পার্সোনাল)',
@@ -684,13 +949,46 @@
           sendMoneyTag: 'সেন্ড মানি',
           numberLabel: 'নম্বর:',
           copyBtn: 'কপি',
-          copiedBtn: 'কপি হয়েছে!',
+          copiedBtn: 'কপি হয়েছে!',
           codLabel: '💵 ক্যাশ অন ডেলিভারি (COD)',
           availableTag: 'চালু আছে',
           codDesc:
-            'ঢাকায় অর্ডার হাতে পাওয়ার পর ডেলিভারি রাইডারকে ক্যাশ টাকা দিন।',
+            'ঢাকায় অর্ডার হাতে পাওয়ার পর ডেলিভারি রাইডারকে ক্যাশ টাকা দিন।',
         },
       };
+
+      function closeAllDrawerGroups(exceptId = null) {
+        document.querySelectorAll('.drawer-group').forEach((group) => {
+          if (group.id !== exceptId) {
+            group.classList.remove('open');
+            const btn = group.querySelector('.drawer-group-trigger');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        if (exceptId !== 'drawerSettings') {
+          const settingsContainer = document.getElementById('drawerSettings');
+          const settingsToggle = document.getElementById(
+            'drawerSettingsToggle'
+          );
+          if (settingsContainer) settingsContainer.classList.remove('open');
+          if (settingsToggle)
+            settingsToggle.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      function toggleSingleDrawerGroup(groupId, triggerBtn) {
+        const groupEl = document.getElementById(groupId);
+        if (!groupEl) return;
+
+        const willOpen = !groupEl.classList.contains('open');
+        closeAllDrawerGroups(willOpen ? groupId : null);
+
+        groupEl.classList.toggle('open', willOpen);
+        if (triggerBtn) {
+          triggerBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        }
+      }
 
       function getCurrentPaymentLang() {
         const bnBtn = document.getElementById('bnLangBtn');
@@ -700,21 +998,17 @@
 
       function applyPaymentLanguage(lang) {
         const dict = paymentTranslations[lang] || paymentTranslations.en;
-        document
-          .querySelectorAll(
-            "#payment-info [data-translate], [data-translate='navPayment']"
-          )
-          .forEach((el) => {
-            const key = el.getAttribute('data-translate');
-            if (key === 'payClickHint') {
-              const isOpen = document
-                .getElementById('easyPaymentBox')
-                ?.classList.contains('open');
-              el.textContent = isOpen ? dict.payHideHint : dict.payClickHint;
-            } else if (dict[key]) {
-              el.textContent = dict[key];
-            }
-          });
+        document.querySelectorAll('[data-translate]').forEach((el) => {
+          const key = el.getAttribute('data-translate');
+          if (key === 'payClickHint') {
+            const isOpen = document
+              .getElementById('easyPaymentBox')
+              ?.classList.contains('open');
+            el.textContent = isOpen ? dict.payHideHint : dict.payClickHint;
+          } else if (dict[key]) {
+            el.textContent = dict[key];
+          }
+        });
       }
 
       function togglePaymentMethodsPanel(forceOpen = false) {
@@ -745,6 +1039,42 @@
         }, 1400);
       }
 
+      function openCustomerOrdersModal(mode = 'active') {
+        const overlay = document.getElementById('customerOrdersOverlay');
+        const modal = document.getElementById('customerOrdersModal');
+        const titleEl = document.getElementById('customerOrdersTitle');
+        const bodyEl = document.getElementById('customerOrdersBody');
+        const lang = getCurrentPaymentLang();
+
+        if (typeof window.renderCustomerOrdersView === 'function') {
+          window.renderCustomerOrdersView(mode, titleEl, bodyEl, lang);
+        } else if (titleEl && bodyEl) {
+          titleEl.textContent =
+            mode === 'history'
+              ? lang === 'bn'
+                ? '📜 অর্ডার হিস্ট্রি'
+                : '📜 Order History'
+              : lang === 'bn'
+              ? '📦 মাই অর্ডারস'
+              : '📦 My Orders';
+          bodyEl.innerHTML = `<p style="color: var(--text-muted);">${
+            lang === 'bn'
+              ? 'এখনো কোনো অর্ডার রেকর্ড পাওয়া যায়নি।'
+              : 'No order records found yet.'
+          }</p>`;
+        }
+
+        if (overlay) overlay.style.display = 'block';
+        if (modal) modal.style.display = 'block';
+      }
+
+      function closeCustomerOrdersModal() {
+        const overlay = document.getElementById('customerOrdersOverlay');
+        const modal = document.getElementById('customerOrdersModal');
+        if (overlay) overlay.style.display = 'none';
+        if (modal) modal.style.display = 'none';
+      }
+
       document.addEventListener('DOMContentLoaded', function () {
         const settingsContainer = document.getElementById('drawerSettings');
         const settingsToggle = document.getElementById('drawerSettingsToggle');
@@ -752,10 +1082,13 @@
         if (settingsContainer && settingsToggle) {
           settingsToggle.addEventListener('click', function (e) {
             e.stopPropagation();
-            const isOpen = settingsContainer.classList.toggle('open');
+            const willOpen = !settingsContainer.classList.contains('open');
+            closeAllDrawerGroups(willOpen ? 'drawerSettings' : null);
+
+            settingsContainer.classList.toggle('open', willOpen);
             settingsToggle.setAttribute(
               'aria-expanded',
-              isOpen ? 'true' : 'false'
+              willOpen ? 'true' : 'false'
             );
           });
         }

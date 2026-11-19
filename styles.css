@@ -354,6 +354,140 @@ input:checked + .slider:before {
   transform: translateX(4px);
 }
 
+/* Nested Navigation Categories in Drawer */
+.drawer-nav-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-group {
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0;
+}
+
+.drawer-group:last-of-type {
+  border-bottom: none;
+}
+
+.drawer-group-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--espresso);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.drawer-group-trigger:hover {
+  background: var(--surface-warm);
+  color: var(--terracotta);
+}
+
+.drawer-sublinks {
+  display: none;
+  list-style: none;
+  padding: 4px 0 8px 14px;
+}
+
+.drawer-group.open .drawer-sublinks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawer-sublinks a,
+.drawer-sublinks button.drawer-sub-btn {
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-sublinks a:hover,
+.drawer-sublinks button.drawer-sub-btn:hover {
+  background: var(--bg-cream);
+  color: var(--terracotta);
+}
+
+.order-badge-pill {
+  background: var(--terracotta);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.drawer-settings {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawer-settings-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--espresso);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.drawer-settings-trigger:hover {
+  background: var(--surface-warm);
+  color: var(--terracotta);
+}
+
+.drawer-settings-panel {
+  display: none;
+  padding: 10px 10px 4px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--border);
+}
+
+.drawer-settings.open .drawer-settings-panel {
+  display: block;
+}
+
+.drawer-settings-panel .setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0;
+  border-bottom: none;
+}
+
+.drawer-settings-panel .setting-item:last-child {
+  margin-bottom: 0;
+}
+
 /* Hero */
 .hero {
   padding: 76px 0;
@@ -501,6 +635,32 @@ input:checked + .slider:before {
   gap: 28px;
 }
 
+@media (min-width: 992px) {
+  .product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .product-card.featured-top-center {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .product-card.row-bottom-1 {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .product-card.row-bottom-2 {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .product-card.row-bottom-3 {
+    grid-column: 3;
+    grid-row: 2;
+  }
+}
+
 .product-card {
   background: var(--bg-cream);
   border: 1px solid var(--border);
@@ -645,6 +805,93 @@ input:checked + .slider:before {
 .info-box p {
   color: var(--text-muted);
   font-size: 0.95rem;
+}
+
+/* Interactive Payment Methods Box */
+.payment-clickable-box {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.payment-clickable-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.payment-click-hint {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--terracotta);
+}
+
+.payment-methods-panel {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.payment-clickable-box.open .payment-methods-panel {
+  display: block;
+}
+
+.payment-option-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.payment-option-card:last-child {
+  margin-bottom: 0;
+}
+
+.payment-option-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.payment-method-title {
+  font-weight: 600;
+  color: var(--espresso);
+  font-size: 0.95rem;
+}
+
+.payment-number-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.payment-number-val {
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--terracotta);
+}
+
+.copy-num-btn {
+  background: var(--bg-cream);
+  border: 1px solid var(--border);
+  color: var(--espresso);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.copy-num-btn:hover {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
 }
 
 /* Footer */
@@ -888,6 +1135,60 @@ input:checked + .slider:before {
   font-size: 0.82rem;
   color: var(--text-muted);
   margin-bottom: 20px;
+}
+
+/* Customer Orders & History Modal */
+.customer-orders-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  max-width: 500px;
+  max-height: 82vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  z-index: 520;
+  box-shadow: var(--shadow-hover);
+}
+
+.customer-orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.order-record-card {
+  background: var(--bg-cream);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.order-record-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.order-status-badge {
+  background: rgba(58, 107, 53, 0.14);
+  color: var(--leaf-green);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 
 @media (max-width: 768px) {
