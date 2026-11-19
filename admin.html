@@ -1,313 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Login & Dashboard | The Clay Pot</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
-  <style>
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-    }
-    .stat-card h4 {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-    .stat-card p {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--terracotta);
-    }
-    .admin-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    .search-box {
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      color: var(--espresso);
-      width: 300px;
-      font-family: inherit;
-    }
-    /* Login Box Styles */
-    #loginScreen {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-cream);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .login-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 40px;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .login-box h2 {
-      margin-bottom: 20px;
-      font-size: 1.6rem;
-    }
-    .login-box input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg-cream);
-      color: var(--espresso);
-      font-family: inherit;
-    }
-    .login-error {
-      color: #e74c3c;
-      font-size: 0.85rem;
-      margin-bottom: 10px;
-      display: none;
-    }
-  </style>
-</head>
-<body style="padding: 40px 20px;">
-
-  <!-- Admin Login Screen -->
-  <div id="loginScreen">
-    <div class="login-box">
-      <h2>🔐 Admin Portal</h2>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Enter your admin Gmail and password to access dashboard.</p>
-      <div id="loginError" class="login-error">Invalid Gmail or Password!</div>
-      <form id="adminLoginForm">
-        <input type="email" id="adminEmail" placeholder="Admin Gmail (e.g., admin@claypot.com)" required />
-        <input type="password" id="adminPassword" placeholder="Password" required />
-        <button type="submit" class="btn-primary full-width" style="margin-top: 10px;">Login to Dashboard</button>
-      </form>
-      <a href="index.html" style="display: block; margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 0.85rem;">← Back to Website</a>
-    </div>
-  </div>
-
-  <!-- Main Admin Dashboard (Hidden until login) -->
-  <div class="container" id="adminDashboardContent" style="display: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
-      <h2>🛡️ E-Commerce Management Dashboard</h2>
-      <div>
-        <button onclick="adminLogout()" style="background: #7f8c8d; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 500; margin-right: 10px;">Logout</button>
-        <a href="index.html" class="btn-primary" style="text-decoration: none; padding: 10px 18px; font-size: 0.9rem;">← Website</a>
-      </div>
-    </div>
-
-    <!-- Analytics Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h4>Total Orders</h4>
-        <p id="totalOrdersCount">0</p>
-      </div>
-      <div class="stat-card">
-        <h4>Total Revenue</h4>
-        <p id="totalRevenueCount">৳0</p>
-      </div>
-      <div class="stat-card">
-        <h4>Pending Orders</h4>
-        <p id="pendingOrdersCount">0</p>
-      </div>
-    </div>
-
-    <!-- Search & Controls Bar -->
-    <div class="admin-controls">
-      <input type="text" id="orderSearchInput" class="search-box" placeholder="Search by Order ID, Name or Phone..." onkeyup="filterOrders()" />
-      <button onclick="clearAllOrders()" style="background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">Clear All History</button>
-    </div>
-
-    <!-- Orders Table Container -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left;" id="ordersTable">
-        <thead>
-          <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.9rem;">
-            <th style="padding: 12px;">Order ID / Date</th>
-            <th style="padding: 12px;">Customer Details</th>
-            <th style="padding: 12px;">Address</th>
-            <th style="padding: 12px;">Items Summary</th>
-            <th style="padding: 12px;">Total</th>
-            <th style="padding: 12px;">Status</th>
-            <th style="padding: 12px; text-align: center;">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="orderHistoryList">
-          <!-- Dynamically injected via script -->
-        </tbody>
-      </table>
-      <p id="noOrdersMsg" style="text-align: center; color: var(--text-muted); padding: 40px; display: none;">No order history found.</p>
-    </div>
-  </div>
-
-  <script>
-    // ----------------------------------------------------
-    // ADMIN CREDENTIALS CONFIGURATION (আপনার ইচ্ছামতো পাল্টে নিতে পারেন)
-    // ----------------------------------------------------
-    const ADMIN_GMAIL = "yeamin@gmail.com"; 
-    const ADMIN_PASS = "admin1234";
-
-    // Check Login State on Page Load
-    window.onload = function() {
-      const isLoggedIn = sessionStorage.getItem('clayPotAdminLoggedIn');
-      if (isLoggedIn === 'true') {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminDashboardContent').style.display = 'block';
-        loadAdminDashboard();
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login & Dashboard | The Clay Pot</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
       }
-    };
-
-    // Handle Login Submit
-    document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = document.getElementById('adminEmail').value.trim();
-      const pass = document.getElementById('adminPassword').value.trim();
-      const errorMsg = document.getElementById('loginError');
-
-      if (email === ADMIN_GMAIL && pass === ADMIN_PASS) {
-        sessionStorage.setItem('clayPotAdminLoggedIn', 'true');
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminDashboardContent').style.display = 'block';
-        loadAdminDashboard();
-      } else {
-        errorMsg.style.display = 'block';
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
       }
-    });
+      .stat-card h4 {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .stat-card p {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--terracotta);
+      }
+      .admin-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .search-box {
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--espresso);
+        width: 300px;
+        font-family: inherit;
+      }
+      #loginScreen {
+        position: fixed;
+        inset: 0;
+        background: var(--bg-cream);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        padding: 20px;
+      }
+      .login-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 36px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 390px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .login-box h2 {
+        margin-bottom: 10px;
+        font-size: 1.6rem;
+      }
+      .login-box input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg-cream);
+        color: var(--espresso);
+        font-family: inherit;
+      }
+      .login-error {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+        display: none;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body style="padding: 40px 20px">
+    <!-- Admin Login Screen -->
+    <div id="loginScreen">
+      <div class="login-box">
+        <h2>🔐 Admin Portal</h2>
+        <p
+          style="
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+          "
+        >
+          Enter your Gmail, Password & Security PIN to access the dashboard.
+        </p>
+        <div id="loginError" class="login-error">
+          Invalid Gmail, Password, or PIN!
+        </div>
+        <form id="adminLoginForm" autocomplete="off">
+          <input
+            type="email"
+            id="adminEmail"
+            placeholder="Admin Gmail"
+            autocomplete="off"
+            required
+          />
+          <input
+            type="password"
+            id="adminPassword"
+            placeholder="Password"
+            autocomplete="new-password"
+            required
+          />
+          <input
+            type="password"
+            id="adminPin"
+            placeholder="6-Digit Security PIN"
+            maxlength="6"
+            autocomplete="off"
+            required
+          />
+          <button
+            type="submit"
+            class="btn-primary full-width"
+            style="margin-top: 6px"
+          >
+            Login to Dashboard
+          </button>
+        </form>
+        <a
+          href="index.html"
+          style="
+            display: block;
+            margin-top: 18px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+          "
+          >← Back to Website</a
+        >
+      </div>
+    </div>
 
-    // Logout Function
-    function adminLogout() {
-      sessionStorage.removeItem('clayPotAdminLoggedIn');
-      location.reload();
-    }
+    <!-- Main Admin Dashboard -->
+    <div class="container" id="adminDashboardContent" style="display: none">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+          flex-wrap: wrap;
+          gap: 15px;
+        "
+      >
+        <h2>🛡️ E-Commerce Management Dashboard</h2>
+        <div>
+          <button
+            onclick="adminLogout()"
+            style="
+              background: #7f8c8d;
+              color: white;
+              border: none;
+              padding: 10px 16px;
+              border-radius: 8px;
+              cursor: pointer;
+              font-weight: 500;
+              margin-right: 10px;
+            "
+          >
+            Logout
+          </button>
+          <a
+            href="index.html"
+            class="btn-primary"
+            style="text-decoration: none; padding: 10px 18px; font-size: 0.9rem"
+            >← Website</a
+          >
+        </div>
+      </div>
 
-    // Load Dashboard Data
-    function loadAdminDashboard() {
-      const orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-      const tbody = document.getElementById('orderHistoryList');
-      const noOrdersMsg = document.getElementById('noOrdersMsg');
-      
-      let totalRevenue = 0;
-      let pendingCount = 0;
+      <!-- Analytics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h4>Total Orders</h4>
+          <p id="totalOrdersCount">0</p>
+        </div>
+        <div class="stat-card">
+          <h4>Total Revenue</h4>
+          <p id="totalRevenueCount">৳0</p>
+        </div>
+        <div class="stat-card">
+          <h4>Pending Orders</h4>
+          <p id="pendingOrdersCount">0</p>
+        </div>
+      </div>
 
-      orders.forEach(order => {
-        totalRevenue += Number(order.total || 0);
-        if (!order.status || order.status === 'Pending') {
-          pendingCount++;
+      <!-- Search & Controls Bar -->
+      <div class="admin-controls">
+        <input
+          type="text"
+          id="orderSearchInput"
+          class="search-box"
+          placeholder="Search by Order ID, Name or Phone..."
+          onkeyup="filterOrders()"
+        />
+        <button
+          onclick="clearAllOrders()"
+          style="
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+          "
+        >
+          Clear All History
+        </button>
+      </div>
+
+      <!-- Orders Table Container -->
+      <div
+        style="
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 20px;
+          overflow-x: auto;
+        "
+      >
+        <table
+          style="width: 100%; border-collapse: collapse; text-align: left"
+          id="ordersTable"
+        >
+          <thead>
+            <tr
+              style="
+                border-bottom: 2px solid var(--border);
+                color: var(--text-muted);
+                font-size: 0.9rem;
+              "
+            >
+              <th style="padding: 12px">Order ID / Date</th>
+              <th style="padding: 12px">Customer Details</th>
+              <th style="padding: 12px">Address</th>
+              <th style="padding: 12px">Items Summary</th>
+              <th style="padding: 12px">Total</th>
+              <th style="padding: 12px">Status</th>
+              <th style="padding: 12px; text-align: center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="orderHistoryList"></tbody>
+        </table>
+        <p
+          id="noOrdersMsg"
+          style="
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px;
+            display: none;
+          "
+        >
+          No order history found.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const ADMIN_GMAIL = 'yeamin@gmail.com';
+      const ADMIN_PASS = 'admin1234';
+      const ADMIN_PIN = '262149';
+
+      window.addEventListener('DOMContentLoaded', function () {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        const isLoggedIn = sessionStorage.getItem('clayPotAdminLoggedIn');
+        if (isLoggedIn === 'true') {
+          showDashboard();
         }
       });
 
-      document.getElementById('totalOrdersCount').textContent = orders.length;
-      document.getElementById('totalRevenueCount').textContent = `৳${totalRevenue}`;
-      document.getElementById('pendingOrdersCount').textContent = pendingCount;
-
-      tbody.innerHTML = '';
-
-      if (orders.length === 0) {
-        noOrdersMsg.style.display = 'block';
-        return;
-      } else {
-        noOrdersMsg.style.display = 'none';
+      function showDashboard() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminDashboardContent').style.display =
+          'block';
+        loadAdminDashboard();
       }
 
-      orders.forEach((order, index) => {
-        const tr = document.createElement('tr');
-        tr.style.borderBottom = '1px solid var(--border)';
-        tr.style.fontSize = '0.9rem';
+      document
+        .getElementById('adminLoginForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          const email = document
+            .getElementById('adminEmail')
+            .value.trim()
+            .toLowerCase();
+          const pass = document.getElementById('adminPassword').value.trim();
+          const pin = document.getElementById('adminPin').value.trim();
+          const errorMsg = document.getElementById('loginError');
 
-        const itemsText = order.items.map(i => `${i.name} (x${i.qty})`).join(', ');
-        const currentStatus = order.status || 'Pending';
+          if (
+            email === ADMIN_GMAIL.toLowerCase() &&
+            pass === ADMIN_PASS &&
+            pin === ADMIN_PIN
+          ) {
+            errorMsg.style.display = 'none';
+            sessionStorage.setItem('clayPotAdminLoggedIn', 'true');
+            showDashboard();
+          } else {
+            errorMsg.style.display = 'block';
+          }
+        });
 
-        tr.innerHTML = `
+      function adminLogout() {
+        sessionStorage.removeItem('clayPotAdminLoggedIn');
+        location.reload();
+      }
+
+      function loadAdminDashboard() {
+        const orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+        const tbody = document.getElementById('orderHistoryList');
+        const noOrdersMsg = document.getElementById('noOrdersMsg');
+
+        let totalRevenue = 0;
+        let pendingCount = 0;
+
+        orders.forEach((order) => {
+          totalRevenue += Number(order.total || 0);
+          if (!order.status || order.status === 'Pending') {
+            pendingCount++;
+          }
+        });
+
+        document.getElementById('totalOrdersCount').textContent = orders.length;
+        document.getElementById(
+          'totalRevenueCount'
+        ).textContent = `৳${totalRevenue}`;
+        document.getElementById('pendingOrdersCount').textContent =
+          pendingCount;
+
+        tbody.innerHTML = '';
+
+        if (orders.length === 0) {
+          noOrdersMsg.style.display = 'block';
+          return;
+        } else {
+          noOrdersMsg.style.display = 'none';
+        }
+
+        orders.forEach((order, index) => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--border)';
+          tr.style.fontSize = '0.9rem';
+
+          const itemsText = order.items
+            .map((i) => `${i.name} (x${i.qty})`)
+            .join(', ');
+          const currentStatus = order.status || 'Pending';
+
+          tr.innerHTML = `
           <td style="padding: 14px;">
-            <strong style="color: var(--terracotta);">${order.orderId}</strong><br/>
-            <small style="color: var(--text-muted);">${order.date || 'Recent'}</small>
+            <strong style="color: var(--terracotta);">${
+              order.orderId
+            }</strong><br/>
+            <small style="color: var(--text-muted);">${
+              order.date || 'Recent'
+            }</small>
           </td>
           <td style="padding: 14px;">
             <strong>${order.name}</strong><br/>
-            <a href="tel:${order.phone}" style="color: var(--terracotta); text-decoration: none;">${order.phone}</a>
+            <a href="tel:${
+              order.phone
+            }" style="color: var(--terracotta); text-decoration: none;">${
+            order.phone
+          }</a>
           </td>
           <td style="padding: 14px; max-width: 180px;">${order.address}</td>
           <td style="padding: 14px; color: var(--text-muted); max-width: 250px;">${itemsText}</td>
           <td style="padding: 14px; font-weight: bold;">৳${order.total}</td>
           <td style="padding: 14px;">
             <select onchange="updateOrderStatus(${index}, this.value)" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-cream); color: var(--espresso); font-size: 0.85rem;">
-              <option value="Pending" ${currentStatus === 'Pending' ? 'selected' : ''}>Pending</option>
-              <option value="Processing" ${currentStatus === 'Processing' ? 'selected' : ''}>Processing</option>
-              <option value="Delivered" ${currentStatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
-              <option value="Cancelled" ${currentStatus === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+              <option value="Pending" ${
+                currentStatus === 'Pending' ? 'selected' : ''
+              }>Pending</option>
+              <option value="Processing" ${
+                currentStatus === 'Processing' ? 'selected' : ''
+              }>Processing</option>
+              <option value="Delivered" ${
+                currentStatus === 'Delivered' ? 'selected' : ''
+              }>Delivered</option>
+              <option value="Cancelled" ${
+                currentStatus === 'Cancelled' ? 'selected' : ''
+              }>Cancelled</option>
             </select>
           </td>
           <td style="padding: 14px; text-align: center; white-space: nowrap;">
-            <button onclick="printInvoice('${order.orderId}')" style="background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-right: 4px;" title="Print Invoice">🖨️</button>
+            <button onclick="printInvoice('${
+              order.orderId
+            }')" style="background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-right: 4px;" title="Print Invoice">🖨️</button>
             <button onclick="deleteOrder(${index})" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;" title="Delete">🗑️</button>
           </td>
         `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function updateOrderStatus(index, newStatus) {
-      let orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-      if (orders[index]) {
-        orders[index].status = newStatus;
-        localStorage.setItem('clayPotOrders', JSON.stringify(orders));
-        loadAdminDashboard();
+          tbody.appendChild(tr);
+        });
       }
-    }
 
-    function filterOrders() {
-      const input = document.getElementById('orderSearchInput').value.toLowerCase();
-      const rows = document.getElementById('orderHistoryList').getElementsByTagName('tr');
-
-      for (let i = 0; i < rows.length; i++) {
-        const text = rows[i].textContent.toLowerCase();
-        rows[i].style.display = text.includes(input) ? '' : 'none';
-      }
-    }
-
-    function deleteOrder(index) {
-      if (confirm('Are you sure you want to delete this order?')) {
+      function updateOrderStatus(index, newStatus) {
         let orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-        orders.splice(index, 1);
-        localStorage.setItem('clayPotOrders', JSON.stringify(orders));
-        loadAdminDashboard();
+        if (orders[index]) {
+          orders[index].status = newStatus;
+          localStorage.setItem('clayPotOrders', JSON.stringify(orders));
+          loadAdminDashboard();
+        }
       }
-    }
 
-    function clearAllOrders() {
-      if (confirm('Warning! This will delete all order histories. Are you sure?')) {
-        localStorage.removeItem('clayPotOrders');
-        loadAdminDashboard();
+      function filterOrders() {
+        const input = document
+          .getElementById('orderSearchInput')
+          .value.toLowerCase();
+        const rows = document
+          .getElementById('orderHistoryList')
+          .getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+          const text = rows[i].textContent.toLowerCase();
+          rows[i].style.display = text.includes(input) ? '' : 'none';
+        }
       }
-    }
 
-    function printInvoice(orderId) {
-      const orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-      const order = orders.find(o => o.orderId === orderId);
-      if (!order) return;
+      function deleteOrder(index) {
+        if (confirm('Are you sure you want to delete this order?')) {
+          let orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+          orders.splice(index, 1);
+          localStorage.setItem('clayPotOrders', JSON.stringify(orders));
+          loadAdminDashboard();
+        }
+      }
 
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      printWindow.document.write(`
+      function clearAllOrders() {
+        if (
+          confirm(
+            'Warning! This will delete all order histories. Are you sure?'
+          )
+        ) {
+          localStorage.removeItem('clayPotOrders');
+          loadAdminDashboard();
+        }
+      }
+
+      function printInvoice(orderId) {
+        const orders = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+        const order = orders.find((o) => o.orderId === orderId);
+        if (!order) return;
+
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        printWindow.document.write(`
         <html>
           <head>
             <title>Invoice - ${order.orderId}</title>
@@ -339,19 +504,23 @@
                 <th>Item Name</th>
                 <th>Quantity</th>
               </tr>
-              ${order.items.map(item => `<tr><td>${item.name}</td><td>${item.qty}</td></tr>`).join('')}
+              ${order.items
+                .map(
+                  (item) => `<tr><td>${item.name}</td><td>${item.qty}</td></tr>`
+                )
+                .join('')}
             </table>
             <div class="total">
               Total Amount: ৳${order.total} (COD)
             </div>
             <script>
               window.onload = function() { window.print(); }
-            </script>
+            <\/script>
           </body>
         </html>
       `);
-      printWindow.document.close();
-    }
-  </script>
-</body>
+        printWindow.document.close();
+      }
+    </script>
+  </body>
 </html>
