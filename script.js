@@ -1,6 +1,8 @@
-// WhatsApp & Delivery Configuration
+// WhatsApp, Delivery & Storage Configuration
 const WHATSAPP_NUMBER = '8801898497847';
-const DELIVERY_FEE = 60;
+const DEFAULT_DELIVERY_FEE = 0; // 0 = Free Delivery at launch; change to 60 for ৳60
+const DELIVERY_FEE_STORAGE_KEY = 'clayPotDeliveryFee';
+const FIREBASE_DELIVERY_FEE_PATH = 'clayPotSettings/deliveryFee';
 const CUSTOMER_ORDERS_KEY = 'clayPotCustomerOrders';
 const FIREBASE_ORDERS_PATH = 'clayPotOrders';
 
@@ -28,9 +30,20 @@ try {
   console.error('Firebase initialization warning:', err);
 }
 
+let currentDeliveryFee = (() => {
+  const saved = localStorage.getItem(DELIVERY_FEE_STORAGE_KEY);
+  if (saved !== null && saved !== '' && !Number.isNaN(Number(saved))) {
+    return Math.max(0, Number(saved));
+  }
+  return DEFAULT_DELIVERY_FEE;
+})();
+
 // Translations Dictionary (English & Bengali)
 const translations = {
   en: {
+    deskMenu: 'Menu',
+    deskDelivery: 'Delivery',
+    deskOrders: 'My Orders',
     cartText: 'Cart',
     menuTitle: 'Navigation Menu',
     navHome: '🏠 Home',
@@ -72,9 +85,21 @@ const translations = {
     payTitle: '💳 Easy Payment Methods',
     payDesc:
       'You can pay securely via <strong>bKash, Nagad, Rocket</strong> or choose <strong>Cash on Delivery (COD)</strong> when your fresh batch arrives at your doorstep in Dhaka.',
+    payClickHint: '▼ Click to view numbers & payment options',
+    payHideHint: '▲ Click to hide numbers & payment options',
+    bkashLabel: '📱 bKash (Personal)',
+    nagadLabel: '📲 Nagad (Personal)',
+    rocketLabel: '🚀 Rocket (Personal)',
+    sendMoneyTag: 'Send Money',
+    numberLabel: 'Number:',
+    copyBtn: 'Copy',
+    codLabel: '💵 Cash on Delivery (COD)',
+    availableTag: 'Available',
+    codDesc:
+      'Pay in cash to the delivery rider upon receiving your order in Dhaka.',
     delTitle: '🚚 Delivery & Coverage',
     delDesc:
-      'We deliver across <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka zones. Standard delivery charge is flat ৳60.',
+      'We deliver across <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka zones. Delivery charge is controlled dynamically from admin.',
     footerSub: 'Rooted in Tradition, Crafted in Clay.',
     footerNote: 'Dhaka Delivery Hotline / WhatsApp Support Available.',
     waChat: 'WhatsApp Chat',
@@ -85,26 +110,39 @@ const translations = {
     deliveryText: 'Dhaka Delivery',
     totalText: 'Total Payable',
     deliveryDetailsTitle: 'Delivery Details',
-    namePh: 'Full Name',
-    phonePh: 'Phone Number (e.g., 017XXXXXXXX)',
-    addressPh: 'Full Address in Dhaka (House, Road, Area)',
+    firstNameLabel: 'First Name *',
+    lastNameLabel: 'Last Name *',
+    phoneLabel: 'Phone Number *',
+    addressFieldLabel: 'Delivery Address in Dhaka *',
+    firstNamePh: 'e.g., Yeamin',
+    lastNamePh: 'e.g., Hossain',
+    phonePh: '017XXXXXXXX',
+    addressPh: 'House, Road, Block, Area (e.g., Bosila, Mohammadpur)',
     confirmOrderBtn: 'Confirm Order Now',
     addToCartBtn: '+ Add to Basket',
     myOrdersTitle: '📦 My Orders',
-    historyTitle: '📜 Order History',
-    noActiveOrders: 'No recent order found yet.',
-    noHistoryOrders: 'No past order history found yet.',
+    historyTitle: '📜 Delivery & Order History',
+    noActiveOrders:
+      'No active order right now. Completed or cancelled orders appear in History.',
+    noHistoryOrders: 'No delivered or cancelled order history found yet.',
     latestConfirmMsg:
-      'Confirmation: Your order has been received and saved for quick reference.',
+      'Live Order Tracker: Status syncs automatically with your order updates.',
     clearHistoryBtn: 'Clear History',
     orderIdLabel: 'Order ID',
     dateLabel: 'Time',
     itemsLabel: 'Items',
     totalLabel: 'Total',
     addressLabel: 'Address',
+    statusPending: 'Pending',
     statusConfirmed: 'Confirmed',
+    statusProcessing: 'Processing',
+    statusDelivered: 'Delivered',
+    statusCancelled: 'Cancelled',
   },
   bn: {
+    deskMenu: 'মেনু',
+    deskDelivery: 'ডেলিভারি',
+    deskOrders: 'মাই অর্ডারস',
     cartText: 'কার্ট',
     menuTitle: 'নেভিগেশন মেনু',
     navHome: '🏠 হোম',
@@ -145,9 +183,20 @@ const translations = {
     payTitle: '💳 সহজ পেমেন্ট পদ্ধতি',
     payDesc:
       'বিকাশ, নগদ, রকেটের মাধ্যমে পেমেন্ট করতে পারেন অথবা ঢাকায় ক্যাশ অন ডেলিভারি (COD) বেছে নিতে পারেন।',
+    payClickHint: '▼ নম্বর ও পেমেন্ট অপশন দেখতে ক্লিক করুন',
+    payHideHint: '▲ নম্বর ও পেমেন্ট অপশন লুকাতে ক্লিক করুন',
+    bkashLabel: '📱 বিকাশ (পার্সোনাল)',
+    nagadLabel: '📲 নগদ (পার্সোনাল)',
+    rocketLabel: '🚀 রকেট (পার্সোনাল)',
+    sendMoneyTag: 'সেন্ড মানি',
+    numberLabel: 'নম্বর:',
+    copyBtn: 'কপি',
+    codLabel: '💵 ক্যাশ অন ডেলিভারি (COD)',
+    availableTag: 'চালু আছে',
+    codDesc: 'ঢাকায় অর্ডার হাতে পাওয়ার পর ডেলিভারি রাইডারকে ক্যাশ টাকা দিন।',
     delTitle: '🚚 ডেলিভারি ও কভারেজ',
     delDesc:
-      'মোহাম্মদপুর, ধানমন্ডি, লালমাটিয়া এবং এর আশপাশে ডেলিভারি করা হয়। ডেলিভারি চার্জ মাত্র ৳৬০ ফ্ল্যাট।',
+      'মোহাম্মদপুর, ধানমন্ডি, লালমাটিয়া এবং এর আশপাশে ডেলিভারি করা হয়। ডেলিভারি চার্জ অ্যাডমিন প্যানেল থেকে নিয়ন্ত্রণ করা যায়।',
     footerSub: 'ঐতিহ্যের শিকড়ে, মাটির ছোঁয়া।',
     footerNote: 'ঢাকা ডেলিভারি হটলাইন / হোয়াটসঅ্যাপ সাপোর্ট চালু আছে।',
     waChat: 'হোয়াটসঅ্যাপ চ্যাট',
@@ -158,30 +207,40 @@ const translations = {
     deliveryText: 'ঢাকা ডেলিভারি',
     totalText: 'সর্বমোট প্রদেয়',
     deliveryDetailsTitle: 'ডেলিভারির বিবরণ',
-    namePh: 'সম্পূর্ণ নাম',
-    phonePh: 'মোবাইল নম্বর (যেমন: 017XXXXXXXX)',
-    addressPh: 'পূর্ণ ঠিকানা (বাসা, রোড, এলাকা)',
+    firstNameLabel: 'নামের প্রথম অংশ (First Name) *',
+    lastNameLabel: 'নামের শেষ অংশ (Last Name) *',
+    phoneLabel: 'মোবাইল নম্বর *',
+    addressFieldLabel: 'ঢাকার পূর্ণ ঠিকানা *',
+    firstNamePh: 'যেমন: ইয়ামিন',
+    lastNamePh: 'যেমন: হোসাইন',
+    phonePh: '017XXXXXXXX',
+    addressPh: 'বাসা, রোড, ব্লক, এলাকা (যেমন: বসিলা, মোহাম্মদপুর)',
     confirmOrderBtn: 'এখনই অর্ডার কনফার্ম করুন',
     addToCartBtn: '+ কার্টে যোগ করুন',
     myOrdersTitle: '📦 মাই অর্ডারস',
-    historyTitle: '📜 অর্ডার হিস্ট্রি',
-    noActiveOrders: 'এখনো কোনো সাম্প্রতিক অর্ডার নেই।',
-    noHistoryOrders: 'আগের কোনো অর্ডার হিস্ট্রি পাওয়া যায়নি।',
+    historyTitle: '📜 ডেলিভারি ও অর্ডার হিস্ট্রি',
+    noActiveOrders:
+      'বর্তমানে কোনো চলমান অর্ডার নেই। ডেলিভার্ড বা ক্যান্সেলড অর্ডার হিস্ট্রিতে দেখা যাবে।',
+    noHistoryOrders: 'এখনো কোনো ডেলিভার্ড বা ক্যান্সেলড অর্ডার হিস্ট্রি নেই।',
     latestConfirmMsg:
-      'কনফার্মেশন: আপনার অর্ডারটি গ্রহণ করা হয়েছে এবং সহজে দেখার জন্য সংরক্ষণ করা হয়েছে।',
+      'লাইভ অর্ডার ট্র্যাকার: অ্যাডমিন স্ট্যাটাস অনুযায়ী এটি স্বয়ংক্রিয়ভাবে আপডেট হয়।',
     clearHistoryBtn: 'হিস্ট্রি মুছুন',
     orderIdLabel: 'অর্ডার আইডি',
-    dateLabel: 'সময়',
+    dateLabel: 'সময়',
     itemsLabel: 'পণ্যসমূহ',
     totalLabel: 'মোট বিল',
     addressLabel: 'ঠিকানা',
+    statusPending: 'পেন্ডিং',
     statusConfirmed: 'কনফার্মড',
+    statusProcessing: 'প্রসেসিং',
+    statusDelivered: 'ডেলিভার্ড',
+    statusCancelled: 'ক্যান্সেলড',
   },
 };
 
 let currentLang = localStorage.getItem('lang') === 'bn' ? 'bn' : 'en';
 
-// Product Catalog with ImgBB Direct Image Links
+// Product Catalog
 const products = [
   {
     id: 1,
@@ -239,9 +298,460 @@ const products = [
 
 let cart = [];
 
-// Save Order to Firebase Realtime Database (with localStorage fallback)
+// ==========================================
+// DYNAMIC DELIVERY FEE SYNC
+// ==========================================
+function formatDeliveryChargeLabel(fee, lang) {
+  if (fee <= 0) {
+    return lang === 'bn' ? 'ফ্রি (৳০)' : 'Free (৳0)';
+  }
+  return `৳${fee}`;
+}
+
+function attachDeliveryFeeListener() {
+  if (!rtdb) {
+    updateCartUI();
+    return;
+  }
+
+  rtdb.ref(FIREBASE_DELIVERY_FEE_PATH).on('value', (snap) => {
+    if (snap.exists() && snap.val() !== null && snap.val() !== '') {
+      const parsed = Number(snap.val());
+      if (!Number.isNaN(parsed) && parsed >= 0) {
+        currentDeliveryFee = parsed;
+        localStorage.setItem(DELIVERY_FEE_STORAGE_KEY, String(parsed));
+        updateCartUI();
+      }
+    } else {
+      rtdb
+        .ref(FIREBASE_DELIVERY_FEE_PATH)
+        .set(currentDeliveryFee)
+        .catch(() => {});
+      updateCartUI();
+    }
+  });
+}
+
+// ==========================================
+// STRICT INPUT VALIDATION (NAME, PHONE, ADDRESS)
+// ==========================================
+const FAKE_NAME_BLOCKLIST = new Set([
+  'xyz',
+  'abc',
+  'abcd',
+  'test',
+  'testing',
+  'demo',
+  'user',
+  'admin',
+  'guest',
+  'name',
+  'first',
+  'last',
+  'none',
+  'null',
+  'undefined',
+  'asdf',
+  'qwer',
+  'qwerty',
+  'zxcv',
+  'fake',
+  'sample',
+  'nobody',
+  'unknown',
+  'aaa',
+  'bbb',
+  'ccc',
+  'xxx',
+]);
+
+function validatePersonName(rawValue, fieldType = 'first') {
+  const value = (rawValue || '').trim().replace(/\s+/g, ' ');
+  const isBn = currentLang === 'bn';
+  const label =
+    fieldType === 'first'
+      ? isBn
+        ? 'নামের প্রথম অংশ'
+        : 'First name'
+      : isBn
+      ? 'নামের শেষ অংশ'
+      : 'Last name';
+
+  if (!value) {
+    return {
+      valid: false,
+      message: isBn ? `${label} অবশ্যই লিখতে হবে।` : `${label} is required.`,
+    };
+  }
+
+  if (value.length < 2 || value.length > 35) {
+    return {
+      valid: false,
+      message: isBn
+        ? `${label} কমপক্ষে ২ অক্ষরের হতে হবে।`
+        : `${label} must be between 2 and 35 characters.`,
+    };
+  }
+
+  const validCharsRegex =
+    /^[A-Za-z\u0980-\u09FF]+(?:[ .'-][A-Za-z\u0980-\u09FF]+)*$/;
+  if (!validCharsRegex.test(value)) {
+    return {
+      valid: false,
+      message: isBn
+        ? `${label}-এ সংখ্যা (123) বা অপ্রয়োজনীয় চিহ্ন ব্যবহার করা যাবে না।`
+        : `${label} cannot contain numbers (123) or invalid symbols.`,
+    };
+  }
+
+  const normalizedLower = value
+    .toLowerCase()
+    .replace(/[^a-z\u0980-\u09FF]/g, '');
+
+  if (FAKE_NAME_BLOCKLIST.has(normalizedLower)) {
+    return {
+      valid: false,
+      message: isBn
+        ? `দয়া করে আপনার আসল ${label} লিখুন (XYZ বা Test গ্রহণযোগ্য নয়)।`
+        : `Please enter your real ${label.toLowerCase()} (XYZ or Test is not allowed).`,
+    };
+  }
+
+  if (/^(.)\1+$/.test(normalizedLower)) {
+    return {
+      valid: false,
+      message: isBn
+        ? `দয়া করে একটি সঠিক ${label} দিন।`
+        : `Please enter a valid ${label.toLowerCase()}.`,
+    };
+  }
+
+  return { valid: true, formatted: value };
+}
+
+const COUNTRY_PHONE_RULES = {
+  '+880': {
+    validate: (digits) => {
+      const local11 =
+        digits.length === 10 && digits.startsWith('1') ? '0' + digits : digits;
+      if (!/^01[3-9]\d{8}$/.test(local11)) return null;
+      const subscriber = local11.slice(3);
+      if (
+        /^(\d)\1{7}$/.test(subscriber) ||
+        subscriber === '12345678' ||
+        subscriber === '87654321'
+      ) {
+        return null;
+      }
+      return `+880${local11.slice(1)}`;
+    },
+    hintEn: 'Enter a valid 11-digit BD mobile number (e.g., 017XXXXXXXX).',
+    hintBn: 'সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)।',
+  },
+  '+91': {
+    validate: (digits) => {
+      const clean =
+        digits.length === 11 && digits.startsWith('0')
+          ? digits.slice(1)
+          : digits;
+      if (!/^[6-9]\d{9}$/.test(clean) || /^(\d)\1{9}$/.test(clean)) return null;
+      return `+91${clean}`;
+    },
+    hintEn: 'Enter a valid 10-digit Indian mobile number.',
+    hintBn: 'সঠিক ১০ ডিজিটের ভারতীয় মোবাইল নম্বর দিন।',
+  },
+  '+966': {
+    validate: (digits) => {
+      const clean =
+        digits.length === 10 && digits.startsWith('0')
+          ? digits.slice(1)
+          : digits;
+      if (!/^5\d{8}$/.test(clean) || /^(\d)\1{8}$/.test(clean)) return null;
+      return `+966${clean}`;
+    },
+    hintEn: 'Enter a valid 9-digit Saudi number (5XXXXXXXX).',
+    hintBn: 'সঠিক ৯ ডিজিটের সৌদি নম্বর দিন (5XXXXXXXX)।',
+  },
+  '+971': {
+    validate: (digits) => {
+      const clean =
+        digits.length === 10 && digits.startsWith('0')
+          ? digits.slice(1)
+          : digits;
+      if (!/^5\d{8}$/.test(clean) || /^(\d)\1{8}$/.test(clean)) return null;
+      return `+971${clean}`;
+    },
+    hintEn: 'Enter a valid 9-digit UAE number (5XXXXXXXX).',
+    hintBn: 'সঠিক ৯ ডিজিটের আরব আমিরাত নম্বর দিন (5XXXXXXXX)।',
+  },
+  '+974': {
+    validate: (digits) => {
+      if (!/^[3567]\d{7}$/.test(digits) || /^(\d)\1{7}$/.test(digits))
+        return null;
+      return `+974${digits}`;
+    },
+    hintEn: 'Enter a valid 8-digit Qatar mobile number.',
+    hintBn: 'সঠিক ৮ ডিজিটের কাতার মোবাইল নম্বর দিন।',
+  },
+  '+965': {
+    validate: (digits) => {
+      if (!/^[569]\d{7}$/.test(digits) || /^(\d)\1{7}$/.test(digits))
+        return null;
+      return `+965${digits}`;
+    },
+    hintEn: 'Enter a valid 8-digit Kuwait mobile number.',
+    hintBn: 'সঠিক ৮ ডিজিটের কুয়েত মোবাইল নম্বর দিন।',
+  },
+  '+968': {
+    validate: (digits) => {
+      if (!/^[79]\d{7}$/.test(digits) || /^(\d)\1{7}$/.test(digits))
+        return null;
+      return `+968${digits}`;
+    },
+    hintEn: 'Enter a valid 8-digit Oman mobile number.',
+    hintBn: 'সঠিক ৮ ডিজিটের ওমান মোবাইল নম্বর দিন।',
+  },
+  '+60': {
+    validate: (digits) => {
+      const clean = digits.startsWith('0') ? digits.slice(1) : digits;
+      if (!/^1\d{8,9}$/.test(clean) || /^(\d)\1+$/.test(clean)) return null;
+      return `+60${clean}`;
+    },
+    hintEn: 'Enter a valid Malaysian mobile number.',
+    hintBn: 'সঠিক মালয়েশিয়ান মোবাইল নম্বর দিন।',
+  },
+  '+65': {
+    validate: (digits) => {
+      if (!/^[89]\d{7}$/.test(digits) || /^(\d)\1{7}$/.test(digits))
+        return null;
+      return `+65${digits}`;
+    },
+    hintEn: 'Enter a valid 8-digit Singapore mobile number.',
+    hintBn: 'সঠিক ৮ ডিজিটের সিঙ্গাপুর মোবাইল নম্বর দিন।',
+  },
+  '+44': {
+    validate: (digits) => {
+      const clean =
+        digits.length === 11 && digits.startsWith('0')
+          ? digits.slice(1)
+          : digits;
+      if (!/^7\d{9}$/.test(clean) || /^(\d)\1{9}$/.test(clean)) return null;
+      return `+44${clean}`;
+    },
+    hintEn: 'Enter a valid UK mobile number (7XXXXXXXXX).',
+    hintBn: 'সঠিক ইউকে মোবাইল নম্বর দিন (7XXXXXXXXX)।',
+  },
+  '+1': {
+    validate: (digits) => {
+      if (!/^[2-9]\d{9}$/.test(digits) || /^(\d)\1{9}$/.test(digits))
+        return null;
+      return `+1${digits}`;
+    },
+    hintEn: 'Enter a valid 10-digit US/Canada phone number.',
+    hintBn: 'সঠিক ১০ ডিজিটের US/Canada ফোন নম্বর দিন।',
+  },
+};
+
+function validateInternationalPhone(countryCode, rawPhone) {
+  const isBn = currentLang === 'bn';
+  const digitsOnly = (rawPhone || '').replace(/\D/g, '');
+
+  if (!digitsOnly) {
+    return {
+      valid: false,
+      message: isBn
+        ? 'ফোন নম্বর অবশ্যই দিতে হবে।'
+        : 'Phone number is required.',
+    };
+  }
+
+  const rule = COUNTRY_PHONE_RULES[countryCode];
+  if (!rule) {
+    if (
+      digitsOnly.length < 7 ||
+      digitsOnly.length > 14 ||
+      /^(\d)\1+$/.test(digitsOnly)
+    ) {
+      return {
+        valid: false,
+        message: isBn
+          ? 'দয়া করে একটি বৈধ ফোন নম্বর দিন।'
+          : 'Please enter a valid phone number.',
+      };
+    }
+    return { valid: true, formatted: `${countryCode}${digitsOnly}` };
+  }
+
+  const normalized = rule.validate(digitsOnly);
+  if (!normalized) {
+    return {
+      valid: false,
+      message: isBn ? rule.hintBn : rule.hintEn,
+    };
+  }
+
+  return { valid: true, formatted: normalized };
+}
+
+function validateDeliveryAddress(rawAddress) {
+  const isBn = currentLang === 'bn';
+  const value = (rawAddress || '').trim().replace(/\s+/g, ' ');
+
+  if (!value) {
+    return {
+      valid: false,
+      message: isBn
+        ? 'ডেলিভারির পূর্ণ ঠিকানা লিখুন।'
+        : 'Delivery address is required.',
+    };
+  }
+
+  if (value.length < 8) {
+    return {
+      valid: false,
+      message: isBn
+        ? 'দয়া করে বাসা, রোড ও এলাকার নামসহ পূর্ণ ঠিকানা দিন।'
+        : 'Please provide a complete address (House, Road, and Area).',
+    };
+  }
+
+  const lower = value.toLowerCase();
+  if (
+    FAKE_NAME_BLOCKLIST.has(lower) ||
+    /^(.)\1+$/.test(lower.replace(/\s/g, ''))
+  ) {
+    return {
+      valid: false,
+      message: isBn
+        ? 'দয়া করে সঠিক ডেলিভারি ঠিকানা লিখুন।'
+        : 'Please enter a valid delivery address.',
+    };
+  }
+
+  return { valid: true, formatted: value };
+}
+
+function setFieldValidationState(inputEl, errorEl, result) {
+  if (!inputEl || !errorEl) return;
+  if (result.valid) {
+    inputEl.classList.remove('input-invalid');
+    errorEl.textContent = '';
+  } else {
+    inputEl.classList.add('input-invalid');
+    errorEl.textContent = result.message;
+  }
+}
+
+// ==========================================
+// ORDER STATUS NORMALIZATION & LIVE SYNC
+// ==========================================
+function normalizeOrderStatus(rawStatus) {
+  const s = String(rawStatus || 'Confirmed')
+    .trim()
+    .toLowerCase();
+  if (s === 'pending') return 'Pending';
+  if (s === 'processing' || s === 'in progress') return 'Processing';
+  if (
+    s === 'delivered' ||
+    s === 'dropped off' ||
+    s === 'drop off' ||
+    s === 'completed'
+  ) {
+    return 'Delivered';
+  }
+  if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
+  return 'Confirmed';
+}
+
+function isFinalOrHistoryStatus(status) {
+  const norm = normalizeOrderStatus(status);
+  return norm === 'Delivered' || norm === 'Cancelled';
+}
+
+function getStatusBadgeInfo(status, t) {
+  const norm = normalizeOrderStatus(status);
+  if (norm === 'Pending') {
+    return { text: t.statusPending, cssClass: 'status-pending' };
+  }
+  if (norm === 'Processing') {
+    return { text: t.statusProcessing, cssClass: 'status-processing' };
+  }
+  if (norm === 'Delivered') {
+    return { text: t.statusDelivered, cssClass: 'status-delivered' };
+  }
+  if (norm === 'Cancelled') {
+    return { text: t.statusCancelled, cssClass: 'status-cancelled' };
+  }
+  return { text: t.statusConfirmed, cssClass: 'status-confirmed' };
+}
+
+function getOrderFirebaseKey(orderId) {
+  return String(orderId || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+}
+
+function syncOrderStatusLocally(orderId, nextStatus) {
+  const normalized = normalizeOrderStatus(nextStatus);
+  let changed = false;
+
+  const customerList = getCustomerOrders();
+  const updatedCustomerList = customerList.map((ord) => {
+    if (
+      ord.orderId === orderId &&
+      normalizeOrderStatus(ord.status) !== normalized
+    ) {
+      changed = true;
+      return { ...ord, status: normalized };
+    }
+    return ord;
+  });
+
+  if (changed) {
+    localStorage.setItem(
+      CUSTOMER_ORDERS_KEY,
+      JSON.stringify(updatedCustomerList)
+    );
+    updateCustomerOrderBadges();
+  }
+
+  try {
+    const adminList = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
+    const updatedAdminList = adminList.map((ord) =>
+      ord.orderId === orderId ? { ...ord, status: normalized } : ord
+    );
+    localStorage.setItem('clayPotOrders', JSON.stringify(updatedAdminList));
+  } catch {}
+
+  const modal = document.getElementById('customerOrdersModal');
+  if (modal && modal.style.display === 'block') {
+    const mode = modal.dataset.currentMode || 'active';
+    const titleEl = document.getElementById('customerOrdersTitle');
+    const bodyEl = document.getElementById('customerOrdersBody');
+    if (titleEl && bodyEl) {
+      window.renderCustomerOrdersView(mode, titleEl, bodyEl, currentLang);
+    }
+  }
+}
+
+function attachRealtimeListenersForCustomerOrders() {
+  if (!rtdb) return;
+  const orders = getCustomerOrders();
+  orders.forEach((ord) => {
+    if (!ord || !ord.orderId) return;
+    const key = getOrderFirebaseKey(ord.orderId);
+    const ref = rtdb.ref(`${FIREBASE_ORDERS_PATH}/${key}/status`);
+    ref.off();
+    ref.on('value', (snap) => {
+      if (snap.exists() && snap.val()) {
+        syncOrderStatusLocally(ord.orderId, snap.val());
+      }
+    });
+  });
+}
+
+// ==========================================
+// FIREBASE & LOCALSTORAGE ORDER PERSISTENCE
+// ==========================================
 async function saveOrderToFirebaseRealtime(orderObj) {
-  // Always keep local copy for instant admin view on same browser if offline
   try {
     let existingOrders =
       JSON.parse(localStorage.getItem('clayPotOrders')) || [];
@@ -253,15 +763,14 @@ async function saveOrderToFirebaseRealtime(orderObj) {
     throw new Error('Realtime Database is not initialized');
   }
 
-  const safeKey = orderObj.orderId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safeKey = getOrderFirebaseKey(orderObj.orderId);
   await rtdb.ref(`${FIREBASE_ORDERS_PATH}/${safeKey}`).set({
     ...orderObj,
-    status: 'Confirmed',
+    status: normalizeOrderStatus(orderObj.status || 'Confirmed'),
     createdAt: Date.now(),
   });
 }
 
-// Fetch All Orders from Firebase Realtime Database (helpful if Admin Panel runs here or reads window.fetchCloudOrders)
 window.fetchCloudOrders = async function () {
   if (!rtdb) return [];
   const snapshot = await rtdb.ref(FIREBASE_ORDERS_PATH).get();
@@ -272,7 +781,6 @@ window.fetchCloudOrders = async function () {
   );
 };
 
-// Customer Orders Helpers
 function getCustomerOrders() {
   try {
     return JSON.parse(localStorage.getItem(CUSTOMER_ORDERS_KEY)) || [];
@@ -283,14 +791,23 @@ function getCustomerOrders() {
 
 function saveCustomerOrder(orderObj) {
   const list = getCustomerOrders();
-  list.unshift(orderObj);
+  list.unshift({
+    ...orderObj,
+    status: normalizeOrderStatus(orderObj.status || 'Confirmed'),
+  });
   localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.stringify(list));
   updateCustomerOrderBadges();
+  attachRealtimeListenersForCustomerOrders();
 }
 
 function clearCustomerOrdersHistory() {
-  localStorage.removeItem(CUSTOMER_ORDERS_KEY);
+  const orders = getCustomerOrders();
+  const remainingActive = orders.filter(
+    (ord) => !isFinalOrHistoryStatus(ord.status)
+  );
+  localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.stringify(remainingActive));
   updateCustomerOrderBadges();
+
   const titleEl = document.getElementById('customerOrdersTitle');
   const bodyEl = document.getElementById('customerOrdersBody');
   if (titleEl && bodyEl) {
@@ -300,15 +817,25 @@ function clearCustomerOrdersHistory() {
 
 function updateCustomerOrderBadges() {
   const orders = getCustomerOrders();
+  const activeOrders = orders.filter(
+    (ord) => !isFinalOrHistoryStatus(ord.status)
+  );
+  const historyOrders = orders.filter((ord) =>
+    isFinalOrHistoryStatus(ord.status)
+  );
+
+  const activeBadgeText = String(activeOrders.length);
+  const historyBadgeText = String(historyOrders.length);
+
   const activeCountEl = document.getElementById('activeOrdersCount');
+  const desktopActiveCountEl = document.getElementById(
+    'desktopActiveOrdersCount'
+  );
   const historyCountEl = document.getElementById('historyOrdersCount');
 
-  if (activeCountEl) {
-    activeCountEl.textContent = orders.length > 0 ? '1' : '0';
-  }
-  if (historyCountEl) {
-    historyCountEl.textContent = String(orders.length);
-  }
+  if (activeCountEl) activeCountEl.textContent = activeBadgeText;
+  if (desktopActiveCountEl) desktopActiveCountEl.textContent = activeBadgeText;
+  if (historyCountEl) historyCountEl.textContent = historyBadgeText;
 }
 
 function formatOrderItemsText(items) {
@@ -316,17 +843,20 @@ function formatOrderItemsText(items) {
   return items.map((i) => `${i.name} × ${i.qty}`).join(', ');
 }
 
-function renderOrderCardHtml(order, t, isLatest = false) {
+function renderOrderCardHtml(order, t, showTrackerNote = false) {
+  const badgeInfo = getStatusBadgeInfo(order.status, t);
   return `
     <div class="order-record-card">
       <div class="order-record-top">
         <strong style="color: var(--terracotta);">${t.orderIdLabel}: ${
     order.orderId
   }</strong>
-        <span class="order-status-badge">${t.statusConfirmed}</span>
+        <span class="order-status-badge ${badgeInfo.cssClass}">${
+    badgeInfo.text
+  }</span>
       </div>
       ${
-        isLatest
+        showTrackerNote
           ? `<p style="font-size: 0.84rem; color: var(--espresso); background: var(--surface); padding: 8px 10px; border-radius: 8px; border: 1px dashed var(--border); margin-bottom: 8px;">${t.latestConfirmMsg}</p>`
           : ''
       }
@@ -346,20 +876,26 @@ function renderOrderCardHtml(order, t, isLatest = false) {
   `;
 }
 
-// Exposed to index.html modal opener
 window.renderCustomerOrdersView = function (mode, titleEl, bodyEl, lang) {
   const activeLang = lang || currentLang;
   const t = translations[activeLang] || translations.en;
+  const modal = document.getElementById('customerOrdersModal');
+  if (modal) modal.dataset.currentMode = mode;
+
   const orders = getCustomerOrders();
 
   if (mode === 'history') {
     titleEl.textContent = t.historyTitle;
-    if (orders.length === 0) {
+    const historyOrders = orders.filter((ord) =>
+      isFinalOrHistoryStatus(ord.status)
+    );
+
+    if (historyOrders.length === 0) {
       bodyEl.innerHTML = `<p style="color: var(--text-muted);">${t.noHistoryOrders}</p>`;
       return;
     }
 
-    const cardsHtml = orders
+    const cardsHtml = historyOrders
       .map((ord) => renderOrderCardHtml(ord, t, false))
       .join('');
 
@@ -376,16 +912,22 @@ window.renderCustomerOrdersView = function (mode, titleEl, bodyEl, lang) {
     `;
   } else {
     titleEl.textContent = t.myOrdersTitle;
-    if (orders.length === 0) {
+    const activeOrders = orders.filter(
+      (ord) => !isFinalOrHistoryStatus(ord.status)
+    );
+
+    if (activeOrders.length === 0) {
       bodyEl.innerHTML = `<p style="color: var(--text-muted);">${t.noActiveOrders}</p>`;
       return;
     }
 
-    bodyEl.innerHTML = renderOrderCardHtml(orders[0], t, true);
+    bodyEl.innerHTML = activeOrders
+      .map((ord, idx) => renderOrderCardHtml(ord, t, idx === 0))
+      .join('');
   }
 };
 
-// Render Menu Products with Shahi Doi Top-Center & 3 Core Items Below
+// Render Menu Products
 function renderProducts() {
   const productGrid = document.getElementById('productGrid');
   if (!productGrid) return;
@@ -430,20 +972,38 @@ function renderProducts() {
   });
 }
 
+function refreshPaymentToggleHint() {
+  const hintEl = document.getElementById('paymentToggleHint');
+  const box = document.getElementById('easyPaymentBox');
+  const t = translations[currentLang] || translations.en;
+  if (hintEl) {
+    const isOpen = box?.classList.contains('open');
+    hintEl.textContent = isOpen ? t.payHideHint : t.payClickHint;
+  }
+}
+window.refreshPaymentToggleHint = refreshPaymentToggleHint;
+
 // Language Switcher Function
 function changeLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('lang', lang);
   const t = translations[lang];
 
-  const enBtn = document.getElementById('enLangBtn');
-  const bnBtn = document.getElementById('bnLangBtn');
-  if (enBtn) enBtn.classList.toggle('active', lang === 'en');
-  if (bnBtn) bnBtn.classList.toggle('active', lang === 'bn');
+  ['enLangBtn', 'desktopEnLangBtn'].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.toggle('active', lang === 'en');
+  });
+
+  ['bnLangBtn', 'desktopBnLangBtn'].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.toggle('active', lang === 'bn');
+  });
 
   document.querySelectorAll('[data-translate]').forEach((el) => {
     const key = el.getAttribute('data-translate');
-    if (t[key]) {
+    if (key === 'payClickHint') {
+      refreshPaymentToggleHint();
+    } else if (t[key]) {
       el.innerHTML = t[key];
     }
   });
@@ -455,40 +1015,44 @@ function changeLanguage(lang) {
     }
   });
 
-  if (typeof window.applyPaymentLanguage === 'function') {
-    window.applyPaymentLanguage(lang);
-  }
-
   renderProducts();
   updateCartUI();
   updateCustomerOrderBadges();
 }
 
-// Dark Mode Toggle Logic
+// Theme Sync Helper
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.documentElement.setAttribute(
+    'data-theme',
+    isDark ? 'dark' : 'light'
+  );
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  if (darkModeToggle) darkModeToggle.checked = isDark;
+
+  const desktopThemeBtn = document.getElementById('desktopThemeBtn');
+  if (desktopThemeBtn) {
+    desktopThemeBtn.textContent = isDark ? '☀️' : '🌙';
+  }
+}
+
 const darkModeToggle = document.getElementById('darkModeToggle');
 if (darkModeToggle) {
   darkModeToggle.addEventListener('change', function () {
-    if (this.checked) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
-    }
+    applyTheme(this.checked ? 'dark' : 'light');
   });
 }
 
-// Load Saved Theme & Language on Startup
-window.addEventListener('DOMContentLoaded', () => {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  if (savedTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    if (darkModeToggle) darkModeToggle.checked = true;
-  }
-
-  changeLanguage(currentLang);
-  updateCustomerOrderBadges();
-});
+const desktopThemeBtn = document.getElementById('desktopThemeBtn');
+if (desktopThemeBtn) {
+  desktopThemeBtn.addEventListener('click', function () {
+    const isCurrentlyDark =
+      document.documentElement.getAttribute('data-theme') === 'dark';
+    applyTheme(isCurrentlyDark ? 'light' : 'dark');
+  });
+}
 
 // Cart Functions
 function addToCart(productId) {
@@ -519,16 +1083,27 @@ function updateCartUI() {
   const cartItemsEl = document.getElementById('cartItems');
   const cartCountEl = document.getElementById('cartCount');
   const subtotalText = document.getElementById('subtotalText');
+  const deliveryFeeTextEl = document.getElementById('deliveryFeeText');
   const totalText = document.getElementById('totalText');
   const t = translations[currentLang];
 
   const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const activeFee = subtotal > 0 ? currentDeliveryFee : 0;
 
   if (cartCountEl) cartCountEl.textContent = totalCount;
   if (subtotalText) subtotalText.textContent = `৳${subtotal}`;
-  if (totalText)
-    totalText.textContent = `৳${subtotal > 0 ? subtotal + DELIVERY_FEE : 60}`;
+  if (deliveryFeeTextEl) {
+    deliveryFeeTextEl.textContent = formatDeliveryChargeLabel(
+      currentDeliveryFee,
+      currentLang
+    );
+  }
+  if (totalText) {
+    totalText.textContent = `৳${
+      subtotal > 0 ? subtotal + activeFee : currentDeliveryFee
+    }`;
+  }
 
   if (!cartItemsEl) return;
 
@@ -550,9 +1125,9 @@ function updateCartUI() {
       }</small>
         </div>
         <div class="qty-controls">
-          <button onclick="changeQty(${item.id}, -1)">-</button>
+          <button type="button" onclick="changeQty(${item.id}, -1)">-</button>
           <span>${item.qty}</span>
-          <button onclick="changeQty(${item.id}, 1)">+</button>
+          <button type="button" onclick="changeQty(${item.id}, 1)">+</button>
         </div>
       </div>
     `
@@ -581,7 +1156,7 @@ if (openCartBtn) openCartBtn.addEventListener('click', openCart);
 if (closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
 if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
 
-// Side Menu Drawer Toggles (Hamburger Menu)
+// Side Menu Drawer Toggles
 const sideMenuDrawer = document.getElementById('sideMenuDrawer');
 const sideMenuOverlay = document.getElementById('sideMenuOverlay');
 
@@ -602,11 +1177,112 @@ if (openMenuBtn) openMenuBtn.addEventListener('click', openSideMenu);
 if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeSideMenu);
 if (sideMenuOverlay) sideMenuOverlay.addEventListener('click', closeSideMenu);
 
-// Checkout & Order ID Modal Confirmation with Firebase Realtime Database Saving
+// Live Validation, Delivery Fee Sync & Realtime Status Sync
+window.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  applyTheme(savedTheme);
+  changeLanguage(currentLang);
+  updateCustomerOrderBadges();
+  attachRealtimeListenersForCustomerOrders();
+  attachDeliveryFeeListener();
+
+  const firstNameInput = document.getElementById('custFirstName');
+  const lastNameInput = document.getElementById('custLastName');
+  const countrySelect = document.getElementById('countryCodeSelect');
+  const phoneInput = document.getElementById('custPhone');
+  const addressInput = document.getElementById('custAddress');
+
+  const firstNameError = document.getElementById('firstNameError');
+  const lastNameError = document.getElementById('lastNameError');
+  const phoneError = document.getElementById('phoneError');
+  const addressError = document.getElementById('addressError');
+
+  if (countrySelect && phoneInput) {
+    countrySelect.addEventListener('change', () => {
+      const code = countrySelect.value;
+      if (code === '+880') {
+        phoneInput.placeholder = '017XXXXXXXX';
+      } else if (code === '+91' || code === '+1') {
+        phoneInput.placeholder = '9876543210';
+      } else if (code === '+966' || code === '+971') {
+        phoneInput.placeholder = '5XXXXXXXX';
+      } else {
+        phoneInput.placeholder = 'XXXXXXXX';
+      }
+
+      if (phoneInput.value.trim()) {
+        setFieldValidationState(
+          phoneInput,
+          phoneError,
+          validateInternationalPhone(code, phoneInput.value)
+        );
+      }
+    });
+  }
+
+  if (phoneInput) {
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/[^\d]/g, '').slice(0, 14);
+      if (phoneError.textContent) {
+        setFieldValidationState(
+          phoneInput,
+          phoneError,
+          validateInternationalPhone(
+            countrySelect ? countrySelect.value : '+880',
+            phoneInput.value
+          )
+        );
+      }
+    });
+  }
+
+  if (firstNameInput) {
+    firstNameInput.addEventListener('blur', () => {
+      setFieldValidationState(
+        firstNameInput,
+        firstNameError,
+        validatePersonName(firstNameInput.value, 'first')
+      );
+    });
+  }
+
+  if (lastNameInput) {
+    lastNameInput.addEventListener('blur', () => {
+      setFieldValidationState(
+        lastNameInput,
+        lastNameError,
+        validatePersonName(lastNameInput.value, 'last')
+      );
+    });
+  }
+
+  if (addressInput) {
+    addressInput.addEventListener('blur', () => {
+      setFieldValidationState(
+        addressInput,
+        addressError,
+        validateDeliveryAddress(addressInput.value)
+      );
+    });
+  }
+
+  [firstNameInput, lastNameInput, countrySelect, phoneInput, addressInput]
+    .filter(Boolean)
+    .forEach((field) => {
+      field.addEventListener('focus', () => {
+        setTimeout(() => {
+          field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 260);
+      });
+    });
+});
+
+// Checkout & Order Submission
 const checkoutForm = document.getElementById('checkoutForm');
 if (checkoutForm) {
   checkoutForm.addEventListener('submit', async function (e) {
     e.preventDefault();
+
     if (cart.length === 0) {
       alert(
         currentLang === 'bn'
@@ -616,26 +1292,72 @@ if (checkoutForm) {
       return;
     }
 
-    const name = document.getElementById('custName').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
-    const address = document.getElementById('custAddress').value.trim();
+    const firstNameInput = document.getElementById('custFirstName');
+    const lastNameInput = document.getElementById('custLastName');
+    const countrySelect = document.getElementById('countryCodeSelect');
+    const phoneInput = document.getElementById('custPhone');
+    const addressInput = document.getElementById('custAddress');
+
+    const firstNameError = document.getElementById('firstNameError');
+    const lastNameError = document.getElementById('lastNameError');
+    const phoneError = document.getElementById('phoneError');
+    const addressError = document.getElementById('addressError');
+
+    const firstRes = validatePersonName(firstNameInput.value, 'first');
+    const lastRes = validatePersonName(lastNameInput.value, 'last');
+    const phoneRes = validateInternationalPhone(
+      countrySelect ? countrySelect.value : '+880',
+      phoneInput.value
+    );
+    const addrRes = validateDeliveryAddress(addressInput.value);
+
+    setFieldValidationState(firstNameInput, firstNameError, firstRes);
+    setFieldValidationState(lastNameInput, lastNameError, lastRes);
+    setFieldValidationState(phoneInput, phoneError, phoneRes);
+    setFieldValidationState(addressInput, addressError, addrRes);
+
+    if (!firstRes.valid) {
+      firstNameInput.focus();
+      return;
+    }
+    if (!lastRes.valid) {
+      lastNameInput.focus();
+      return;
+    }
+    if (!phoneRes.valid) {
+      phoneInput.focus();
+      return;
+    }
+    if (!addrRes.valid) {
+      addressInput.focus();
+      return;
+    }
+
+    const fullName = `${firstRes.formatted} ${lastRes.formatted}`;
+    const fullPhone = phoneRes.formatted;
+    const cleanAddress = addrRes.formatted;
 
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-    const total = subtotal + DELIVERY_FEE;
+    const total = subtotal + currentDeliveryFee;
 
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     const orderId = `#TCP-${randomNum}`;
 
     const newOrder = {
       orderId,
-      name,
-      phone,
-      address,
+      firstName: firstRes.formatted,
+      lastName: lastRes.formatted,
+      name: fullName,
+      countryCode: countrySelect ? countrySelect.value : '+880',
+      phone: fullPhone,
+      address: cleanAddress,
       items: cart.map((item) => ({
         name: currentLang === 'bn' ? item.nameBn : item.nameEn,
         qty: item.qty,
       })),
+      deliveryFee: currentDeliveryFee,
       total,
+      status: 'Confirmed',
       date: new Date().toLocaleString(),
     };
 
@@ -648,9 +1370,9 @@ if (checkoutForm) {
     saveCustomerOrder(newOrder);
 
     document.getElementById('modalOrderId').textContent = orderId;
-    document.getElementById('modalCustName').textContent = name;
-    document.getElementById('modalCustPhone').textContent = phone;
-    document.getElementById('modalCustAddress').textContent = address;
+    document.getElementById('modalCustName').textContent = fullName;
+    document.getElementById('modalCustPhone').textContent = fullPhone;
+    document.getElementById('modalCustAddress').textContent = cleanAddress;
     document.getElementById('modalTotalAmount').textContent = `৳${total}`;
 
     closeCart();
@@ -660,6 +1382,9 @@ if (checkoutForm) {
     cart = [];
     updateCartUI();
     checkoutForm.reset();
+    [firstNameError, lastNameError, phoneError, addressError].forEach((el) => {
+      if (el) el.textContent = '';
+    });
   });
 }
 

@@ -2,259 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>The Clay Pot | Authentic Bogura Mishti Doi in Dhaka</title>
     <link rel="icon" href="logo.png" type="image/png" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <style>
-      /* Nested Navigation Categories in Drawer */
-      .drawer-group {
-        border-bottom: 1px solid var(--border);
-        padding: 8px 0;
-      }
-      .drawer-group:last-of-type {
-        border-bottom: none;
-      }
-      .drawer-group-trigger {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        background: transparent;
-        border: none;
-        color: var(--espresso);
-        font-family: inherit;
-        font-size: 1rem;
-        font-weight: 600;
-        padding: 9px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        text-align: left;
-      }
-      .drawer-group-trigger:hover {
-        background: var(--surface-warm, var(--bg-cream));
-        color: var(--terracotta);
-      }
-      .drawer-sublinks {
-        display: none;
-        list-style: none;
-        padding: 4px 0 8px 14px;
-      }
-      .drawer-group.open .drawer-sublinks {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-      .drawer-sublinks a,
-      .drawer-sublinks button.drawer-sub-btn {
-        width: 100%;
-        text-align: left;
-        text-decoration: none;
-        background: transparent;
-        border: none;
-        font-family: inherit;
-        color: var(--text-muted);
-        font-size: 0.94rem;
-        font-weight: 500;
-        padding: 7px 12px;
-        border-radius: 7px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .drawer-sublinks a:hover,
-      .drawer-sublinks button.drawer-sub-btn:hover {
-        background: var(--bg-cream);
-        color: var(--terracotta);
-      }
-      .order-badge-pill {
-        background: var(--terracotta);
-        color: #fff;
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 2px 7px;
-        border-radius: 999px;
-      }
-
-      .drawer-settings {
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border);
-      }
-      .drawer-settings-trigger {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        background: transparent;
-        border: none;
-        color: var(--espresso);
-        font-family: inherit;
-        font-size: 1rem;
-        font-weight: 600;
-        padding: 9px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        text-align: left;
-      }
-      .drawer-settings-trigger:hover {
-        background: var(--surface-warm, var(--bg-cream));
-        color: var(--terracotta);
-      }
-      .drawer-settings-panel {
-        display: none;
-        padding: 10px 10px 4px;
-        margin-top: 4px;
-        border-top: 1px dashed var(--border);
-      }
-      .drawer-settings.open .drawer-settings-panel {
-        display: block;
-      }
-      .drawer-settings-panel .setting-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-      }
-      .drawer-settings-panel .setting-item:last-child {
-        margin-bottom: 0;
-      }
-
-      /* Interactive Payment Methods Box */
-      .payment-clickable-box {
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-      .payment-clickable-box:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-      }
-      .payment-click-hint {
-        display: inline-block;
-        margin-top: 8px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--terracotta);
-      }
-      .payment-methods-panel {
-        display: none;
-        margin-top: 14px;
-        padding-top: 14px;
-        border-top: 1px dashed var(--border);
-      }
-      .payment-clickable-box.open .payment-methods-panel {
-        display: block;
-      }
-      .payment-option-card {
-        background: var(--bg-cream);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-      }
-      .payment-option-card:last-child {
-        margin-bottom: 0;
-      }
-      .payment-option-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      .payment-method-title {
-        font-weight: 600;
-        color: var(--espresso);
-        font-size: 0.95rem;
-      }
-      .payment-number-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 6px;
-        font-size: 0.9rem;
-        color: var(--text-muted);
-      }
-      .payment-number-val {
-        font-family: monospace;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--terracotta);
-      }
-      .copy-num-btn {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        color: var(--espresso);
-        border-radius: 6px;
-        padding: 3px 8px;
-        font-size: 0.78rem;
-        cursor: pointer;
-      }
-      .copy-num-btn:hover {
-        border-color: var(--terracotta);
-        color: var(--terracotta);
-      }
-
-      /* Customer Orders & History Modal */
-      .customer-orders-modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 92%;
-        max-width: 500px;
-        max-height: 82vh;
-        overflow-y: auto;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 24px;
-        z-index: 520;
-        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25);
-      }
-      .customer-orders-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 12px;
-        margin-bottom: 16px;
-      }
-      .order-record-card {
-        background: var(--bg-cream);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 14px;
-        margin-bottom: 12px;
-        font-size: 0.9rem;
-      }
-      .order-record-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 6px;
-        flex-wrap: wrap;
-      }
-      .order-status-badge {
-        background: rgba(58, 107, 53, 0.14);
-        color: var(--leaf-green);
-        font-size: 0.78rem;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 999px;
-      }
-    </style>
   </head>
   <body>
     <!-- Navbar -->
     <header class="navbar">
       <div class="container nav-content">
-        <!-- Left Side: Brand Logo -->
+        <!-- Left Side: Brand Logo (Home) -->
         <div class="nav-left">
           <a href="#" class="brand">
             <img
@@ -267,8 +31,59 @@
           </a>
         </div>
 
-        <!-- Right Side: Cart + Hamburger Menu -->
+        <!-- Center: Clean 3-Link Desktop Navigation -->
+        <nav class="desktop-nav" aria-label="Primary Navigation">
+          <a href="#menu" class="desktop-nav-link" data-translate="deskMenu"
+            >Menu</a
+          >
+          <a
+            href="#delivery-info"
+            class="desktop-nav-link"
+            data-translate="deskDelivery"
+            >Delivery</a
+          >
+          <button
+            type="button"
+            class="desktop-nav-link desktop-nav-btn"
+            onclick="openCustomerOrdersModal('active')"
+          >
+            <span data-translate="deskOrders">My Orders</span>
+            <span class="nav-mini-badge" id="desktopActiveOrdersCount">0</span>
+          </button>
+        </nav>
+
+        <!-- Right Side: Desktop Quick Controls + Cart + Mobile Hamburger Menu -->
         <div class="nav-right">
+          <div class="desktop-quick-controls">
+            <button
+              type="button"
+              class="icon-pill-btn"
+              id="desktopThemeBtn"
+              title="Toggle Dark / Light Mode"
+              aria-label="Toggle Theme"
+            >
+              🌙
+            </button>
+            <div class="lang-btns desktop-lang-btns">
+              <button
+                type="button"
+                onclick="changeLanguage('en')"
+                class="lang-btn active"
+                id="desktopEnLangBtn"
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onclick="changeLanguage('bn')"
+                class="lang-btn"
+                id="desktopBnLangBtn"
+              >
+                বাংলা
+              </button>
+            </div>
+          </div>
+
           <button class="cart-btn" id="openCartBtn">
             🛒 <span data-translate="cartText">Cart</span> (<span id="cartCount"
               >0</span
@@ -286,7 +101,7 @@
       </div>
     </header>
 
-    <!-- Side Navigation Drawer (Hamburger Menu) -->
+    <!-- Side Navigation Drawer (Mobile / Tablet & Full Menu) -->
     <div class="side-menu-overlay" id="sideMenuOverlay"></div>
     <aside class="side-menu-drawer" id="sideMenuDrawer">
       <div class="side-menu-header">
@@ -316,12 +131,12 @@
             onclick="toggleSingleDrawerGroup('groupShopOrders', this)"
             aria-expanded="false"
           >
-            <span data-translate="catShopOrders">🛍️ Shop & Orders</span>
+            <span data-translate="catShopOrders">🛍️ Shop &amp; Orders</span>
           </button>
           <ul class="drawer-sublinks">
             <li>
               <a href="#menu" onclick="closeSideMenu()" data-translate="navMenu"
-                >🍯 Our Menu & Collection</a
+                >🍯 Our Menu &amp; Collection</a
               >
             </li>
             <li>
@@ -346,7 +161,7 @@
             aria-expanded="false"
           >
             <span data-translate="catOrderDelivery"
-              >🚚 Order & Delivery Info</span
+              >🚚 Order &amp; Delivery Info</span
             >
           </button>
           <ul class="drawer-sublinks">
@@ -363,7 +178,7 @@
                 href="#delivery-info"
                 onclick="closeSideMenu()"
                 data-translate="navDelivery"
-                >📍 Delivery Areas & Charges</a
+                >📍 Delivery Areas &amp; Charges</a
               >
             </li>
             <li>
@@ -395,13 +210,14 @@
                 href="#contact"
                 onclick="closeSideMenu()"
                 data-translate="navContact"
-                >📞 Contact & WhatsApp</a
+                >📞 Contact &amp; WhatsApp</a
               >
             </li>
             <li>
               <a
                 href="https://facebook.com"
                 target="_blank"
+                rel="noopener noreferrer"
                 onclick="closeSideMenu()"
                 data-translate="navFacebook"
                 >📘 Facebook</a
@@ -411,6 +227,7 @@
               <a
                 href="https://instagram.com"
                 target="_blank"
+                rel="noopener noreferrer"
                 onclick="closeSideMenu()"
                 data-translate="navInstagram"
                 >📸 Instagram</a
@@ -479,7 +296,7 @@
                 href="#heritage"
                 onclick="closeSideMenu()"
                 data-translate="navStory"
-                >📖 Our Story & Craft</a
+                >📖 Our Story &amp; Craft</a
               >
             </li>
           </ul>
@@ -597,16 +414,14 @@
             id="paymentToggleHint"
             data-translate="payClickHint"
           >
-            ▼ Click to view numbers & payment options
+            ▼ Click to view numbers &amp; payment options
           </span>
 
-          <!-- Expandable Payment Options & Numbers -->
           <div
             class="payment-methods-panel"
             id="paymentMethodsPanel"
             onclick="event.stopPropagation()"
           >
-            <!-- bKash -->
             <div class="payment-option-card">
               <div class="payment-option-top">
                 <span class="payment-method-title" data-translate="bkashLabel"
@@ -634,7 +449,6 @@
               </div>
             </div>
 
-            <!-- Nagad -->
             <div class="payment-option-card">
               <div class="payment-option-top">
                 <span class="payment-method-title" data-translate="nagadLabel"
@@ -662,7 +476,6 @@
               </div>
             </div>
 
-            <!-- Rocket -->
             <div class="payment-option-card">
               <div class="payment-option-top">
                 <span class="payment-method-title" data-translate="rocketLabel"
@@ -690,7 +503,6 @@
               </div>
             </div>
 
-            <!-- Cash on Delivery -->
             <div class="payment-option-card">
               <div class="payment-option-top">
                 <span class="payment-method-title" data-translate="codLabel"
@@ -722,11 +534,11 @@
         </div>
 
         <div class="info-box" id="delivery-info">
-          <h3 data-translate="delTitle">🚚 Delivery & Coverage</h3>
+          <h3 data-translate="delTitle">🚚 Delivery &amp; Coverage</h3>
           <p data-translate="delDesc">
             We deliver across
             <strong>Mohammadpur, Dhanmondi, Lalmatia</strong> and nearby Dhaka
-            zones. Standard delivery charge is flat ৳60.
+            zones. Delivery charge is controlled dynamically from admin.
           </p>
         </div>
       </div>
@@ -748,10 +560,15 @@
           <a
             href="https://wa.me/8801898497847"
             target="_blank"
+            rel="noopener noreferrer"
             data-translate="waChat"
             >WhatsApp Chat</a
           >
-          <a href="https://facebook.com" target="_blank" data-translate="fbPage"
+          <a
+            href="https://facebook.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-translate="fbPage"
             >Facebook Page</a
           >
         </div>
@@ -760,68 +577,150 @@
 
     <!-- Slide-Out Cart & Checkout Drawer -->
     <div class="cart-overlay" id="cartOverlay"></div>
-    <aside class="cart-drawer" id="cartDrawer">
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Order Basket">
       <div class="cart-header">
         <h3 data-translate="basketTitle">Your Order Basket</h3>
-        <button class="close-btn" id="closeCartBtn">&times;</button>
+        <button class="close-btn" id="closeCartBtn" aria-label="Close Cart">
+          &times;
+        </button>
       </div>
 
-      <div class="cart-items" id="cartItems">
-        <p class="empty-msg" data-translate="emptyCartMsg">
-          Your basket is empty.
-        </p>
-      </div>
-
-      <form class="checkout-form" id="checkoutForm">
-        <div class="bill-summary">
-          <div class="bill-row">
-            <span data-translate="subtotalText">Subtotal</span
-            ><span id="subtotalText">৳0</span>
-          </div>
-          <div class="bill-row">
-            <span data-translate="deliveryText">Dhaka Delivery</span
-            ><span>৳60</span>
-          </div>
-          <div class="bill-row total">
-            <span data-translate="totalText">Total Payable</span
-            ><span id="totalText">৳60</span>
-          </div>
+      <div class="cart-scroll-area" id="cartScrollArea">
+        <div class="cart-items" id="cartItems">
+          <p class="empty-msg" data-translate="emptyCartMsg">
+            Your basket is empty.
+          </p>
         </div>
 
-        <h4 data-translate="deliveryDetailsTitle">Delivery Details</h4>
-        <input
-          type="text"
-          id="custName"
-          placeholder="Full Name"
-          data-translate-placeholder="namePh"
-          required
-        />
-        <input
-          type="tel"
-          id="custPhone"
-          placeholder="Phone Number (e.g., 017XXXXXXXX)"
-          data-translate-placeholder="phonePh"
-          required
-        />
-        <textarea
-          id="custAddress"
-          rows="2"
-          placeholder="Full Address in Dhaka (House, Road, Area)"
-          data-translate-placeholder="addressPh"
-          required
-        ></textarea>
+        <form class="checkout-form" id="checkoutForm" novalidate>
+          <div class="bill-summary">
+            <div class="bill-row">
+              <span data-translate="subtotalText">Subtotal</span
+              ><span id="subtotalText">৳0</span>
+            </div>
+            <div class="bill-row">
+              <span data-translate="deliveryText">Dhaka Delivery</span
+              ><span id="deliveryFeeText">Free (৳0)</span>
+            </div>
+            <div class="bill-row total">
+              <span data-translate="totalText">Total Payable</span
+              ><span id="totalText">৳0</span>
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          class="btn-primary full-width"
-          data-translate="confirmOrderBtn"
-        >
-          Confirm Order Now
-        </button>
-      </form>
+          <h4 data-translate="deliveryDetailsTitle">Delivery Details</h4>
+
+          <div class="name-row">
+            <div class="field-group">
+              <label
+                for="custFirstName"
+                class="field-label"
+                data-translate="firstNameLabel"
+                >First Name *</label
+              >
+              <input
+                type="text"
+                id="custFirstName"
+                placeholder="e.g., Yeamin"
+                data-translate-placeholder="firstNamePh"
+                autocomplete="given-name"
+                required
+              />
+              <span class="field-error" id="firstNameError"></span>
+            </div>
+
+            <div class="field-group">
+              <label
+                for="custLastName"
+                class="field-label"
+                data-translate="lastNameLabel"
+                >Last Name *</label
+              >
+              <input
+                type="text"
+                id="custLastName"
+                placeholder="e.g., Hossain"
+                data-translate-placeholder="lastNamePh"
+                autocomplete="family-name"
+                required
+              />
+              <span class="field-error" id="lastNameError"></span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label
+              for="custPhone"
+              class="field-label"
+              data-translate="phoneLabel"
+              >Phone Number *</label
+            >
+            <div class="phone-input-group">
+              <select
+                id="countryCodeSelect"
+                class="country-code-select"
+                aria-label="Country Code"
+              >
+                <option value="+880" data-country="BD" selected>
+                  🇧🇩 +880 (BD)
+                </option>
+                <option value="+91" data-country="IN">🇮🇳 +91 (IN)</option>
+                <option value="+966" data-country="SA">🇸🇦 +966 (SA)</option>
+                <option value="+971" data-country="AE">🇦🇪 +971 (AE)</option>
+                <option value="+974" data-country="QA">🇶🇦 +974 (QA)</option>
+                <option value="+965" data-country="KW">🇰🇼 +965 (KW)</option>
+                <option value="+968" data-country="OM">🇴🇲 +968 (OM)</option>
+                <option value="+60" data-country="MY">🇲🇾 +60 (MY)</option>
+                <option value="+65" data-country="SG">🇸🇬 +65 (SG)</option>
+                <option value="+44" data-country="GB">🇬🇧 +44 (UK)</option>
+                <option value="+1" data-country="US">🇺🇸 +1 (US/CA)</option>
+              </select>
+              <input
+                type="tel"
+                id="custPhone"
+                inputmode="numeric"
+                placeholder="017XXXXXXXX"
+                data-translate-placeholder="phonePh"
+                autocomplete="tel-national"
+                required
+              />
+            </div>
+            <span class="field-error" id="phoneError"></span>
+          </div>
+
+          <div class="field-group">
+            <label
+              for="custAddress"
+              class="field-label"
+              data-translate="addressFieldLabel"
+              >Delivery Address in Dhaka *</label
+            >
+            <textarea
+              id="custAddress"
+              rows="2"
+              placeholder="House, Road, Block, Area (e.g., Bosila, Mohammadpur)"
+              data-translate-placeholder="addressPh"
+              autocomplete="street-address"
+              required
+            ></textarea>
+            <span class="field-error" id="addressError"></span>
+          </div>
+
+          <div class="checkout-submit-bar">
+            <button
+              type="submit"
+              id="confirmOrderBtn"
+              class="btn-primary full-width confirm-order-btn"
+              data-translate="confirmOrderBtn"
+            >
+              Confirm Order Now
+            </button>
+          </div>
+        </form>
+      </div>
     </aside>
 
-    <!-- Order Success Modal (Order ID & Confirmation Box) -->
+    <!-- Order Success Modal -->
     <div
       class="cart-overlay"
       id="successModalOverlay"
@@ -900,67 +799,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
     <script>
-      const paymentTranslations = {
-        en: {
-          navHome: '🏠 Home',
-          catShopOrders: '🛍️ Shop & Orders',
-          navMenu: '🍯 Our Menu & Collection',
-          navMyOrders: '📦 My Orders',
-          catOrderDelivery: '🚚 Order & Delivery Info',
-          navPayment: '💳 Payment Info',
-          navDelivery: '📍 Delivery Areas & Charges',
-          navHistory: '📜 History',
-          catSupport: '🎧 Support',
-          navContact: '📞 Contact & WhatsApp',
-          navFacebook: '📘 Facebook',
-          navInstagram: '📸 Instagram',
-          catAboutBrand: '🏷️ About The Brand',
-          navStory: '📖 Our Story & Craft',
-          payClickHint: '▼ Click to view numbers & payment options',
-          payHideHint: '▲ Click to hide numbers & payment options',
-          bkashLabel: '📱 bKash (Personal)',
-          nagadLabel: '📲 Nagad (Personal)',
-          rocketLabel: '🚀 Rocket (Personal)',
-          sendMoneyTag: 'Send Money',
-          numberLabel: 'Number:',
-          copyBtn: 'Copy',
-          copiedBtn: 'Copied!',
-          codLabel: '💵 Cash on Delivery (COD)',
-          availableTag: 'Available',
-          codDesc:
-            'Pay in cash to the delivery rider upon receiving your order in Dhaka.',
-        },
-        bn: {
-          navHome: '🏠 হোম',
-          catShopOrders: '🛍️ শপ ও অর্ডারস',
-          navMenu: '🍯 আওয়ার মেনু ও কালেকশন',
-          navMyOrders: '📦 মাই অর্ডারস',
-          catOrderDelivery: '🚚 অর্ডার ও ডেলিভারি তথ্য',
-          navPayment: '💳 পেমেন্ট তথ্য',
-          navDelivery: '📍 ডেলিভারি এরিয়া ও চার্জ',
-          navHistory: '📜 হিস্ট্রি',
-          catSupport: '🎧 সাপোর্ট',
-          navContact: '📞 কন্টাক্ট ও হোয়াটসঅ্যাপ',
-          navFacebook: '📘 ফেসবুক',
-          navInstagram: '📸 ইনস্টাগ্রাম',
-          catAboutBrand: '🏷️ ব্র্যান্ড পরিচিতি',
-          navStory: '📖 আওয়ার স্টোরি ও ক্রাফট',
-          payClickHint: '▼ নম্বর ও পেমেন্ট অপশন দেখতে ক্লিক করুন',
-          payHideHint: '▲ নম্বর ও পেমেন্ট অপশন লুকাতে ক্লিক করুন',
-          bkashLabel: '📱 বিকাশ (পার্সোনাল)',
-          nagadLabel: '📲 নগদ (পার্সোনাল)',
-          rocketLabel: '🚀 রকেট (পার্সোনাল)',
-          sendMoneyTag: 'সেন্ড মানি',
-          numberLabel: 'নম্বর:',
-          copyBtn: 'কপি',
-          copiedBtn: 'কপি হয়েছে!',
-          codLabel: '💵 ক্যাশ অন ডেলিভারি (COD)',
-          availableTag: 'চালু আছে',
-          codDesc:
-            'ঢাকায় অর্ডার হাতে পাওয়ার পর ডেলিভারি রাইডারকে ক্যাশ টাকা দিন।',
-        },
-      };
-
       function closeAllDrawerGroups(exceptId = null) {
         document.querySelectorAll('.drawer-group').forEach((group) => {
           if (group.id !== exceptId) {
@@ -994,34 +832,15 @@
         }
       }
 
-      function getCurrentPaymentLang() {
-        const bnBtn = document.getElementById('bnLangBtn');
-        if (bnBtn && bnBtn.classList.contains('active')) return 'bn';
-        return localStorage.getItem('lang') === 'bn' ? 'bn' : 'en';
-      }
-
-      function applyPaymentLanguage(lang) {
-        const dict = paymentTranslations[lang] || paymentTranslations.en;
-        document.querySelectorAll('[data-translate]').forEach((el) => {
-          const key = el.getAttribute('data-translate');
-          if (key === 'payClickHint') {
-            const isOpen = document
-              .getElementById('easyPaymentBox')
-              ?.classList.contains('open');
-            el.textContent = isOpen ? dict.payHideHint : dict.payClickHint;
-          } else if (dict[key]) {
-            el.textContent = dict[key];
-          }
-        });
-      }
-
       function togglePaymentMethodsPanel(forceOpen = false) {
         const box = document.getElementById('easyPaymentBox');
         if (!box) return;
         const shouldOpen = forceOpen ? true : !box.classList.contains('open');
         box.classList.toggle('open', shouldOpen);
         box.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
-        applyPaymentLanguage(getCurrentPaymentLang());
+        if (typeof window.refreshPaymentToggleHint === 'function') {
+          window.refreshPaymentToggleHint();
+        }
       }
 
       function openPaymentDetailsFromMenu() {
@@ -1032,14 +851,12 @@
         const numEl = document.getElementById(elementId);
         if (!numEl) return;
         const textToCopy = numEl.textContent.trim();
-        const lang = getCurrentPaymentLang();
-        const dict = paymentTranslations[lang] || paymentTranslations.en;
+        const isBn = localStorage.getItem('lang') === 'bn';
 
         navigator.clipboard?.writeText(textToCopy).catch(() => {});
-        const prevText = btnEl.textContent;
-        btnEl.textContent = dict.copiedBtn;
+        btnEl.textContent = isBn ? 'কপি হয়েছে!' : 'Copied!';
         setTimeout(() => {
-          btnEl.textContent = dict.copyBtn || prevText;
+          btnEl.textContent = isBn ? 'কপি' : 'Copy';
         }, 1400);
       }
 
@@ -1048,24 +865,10 @@
         const modal = document.getElementById('customerOrdersModal');
         const titleEl = document.getElementById('customerOrdersTitle');
         const bodyEl = document.getElementById('customerOrdersBody');
-        const lang = getCurrentPaymentLang();
+        const lang = localStorage.getItem('lang') === 'bn' ? 'bn' : 'en';
 
         if (typeof window.renderCustomerOrdersView === 'function') {
           window.renderCustomerOrdersView(mode, titleEl, bodyEl, lang);
-        } else if (titleEl && bodyEl) {
-          titleEl.textContent =
-            mode === 'history'
-              ? lang === 'bn'
-                ? '📜 অর্ডার হিস্ট্রি'
-                : '📜 Order History'
-              : lang === 'bn'
-              ? '📦 মাই অর্ডারস'
-              : '📦 My Orders';
-          bodyEl.innerHTML = `<p style="color: var(--text-muted);">${
-            lang === 'bn'
-              ? 'এখনো কোনো অর্ডার রেকর্ড পাওয়া যায়নি।'
-              : 'No order records found yet.'
-          }</p>`;
         }
 
         if (overlay) overlay.style.display = 'block';
@@ -1096,17 +899,6 @@
             );
           });
         }
-
-        const enBtn = document.getElementById('enLangBtn');
-        const bnBtn = document.getElementById('bnLangBtn');
-        if (enBtn) {
-          enBtn.addEventListener('click', () => applyPaymentLanguage('en'));
-        }
-        if (bnBtn) {
-          bnBtn.addEventListener('click', () => applyPaymentLanguage('bn'));
-        }
-
-        applyPaymentLanguage(getCurrentPaymentLang());
       });
     </script>
     <script src="script.js"></script>
