@@ -167,33 +167,25 @@
             margin-bottom: 18px;
           "
         >
-          Enter your Gmail, Password &amp; Security PIN to access the dashboard.
+          Sign in with your Firebase Admin Email &amp; Password to access the
+          dashboard.
         </p>
         <div id="loginError" class="login-error">
-          Invalid Gmail, Password, or PIN!
+          Invalid Admin Email or Password!
         </div>
         <form id="adminLoginForm" autocomplete="off">
           <input
             type="email"
             id="adminEmail"
-            placeholder="Admin Gmail"
-            autocomplete="off"
+            placeholder="Admin Email"
+            autocomplete="email"
             required
           />
           <input
             type="password"
             id="adminPassword"
             placeholder="Password"
-            autocomplete="new-password"
-            required
-          />
-          <input
-            type="password"
-            id="adminPin"
-            placeholder="6-Digit Security PIN"
-            inputmode="numeric"
-            maxlength="6"
-            autocomplete="off"
+            autocomplete="current-password"
             required
           />
           <button
@@ -240,6 +232,10 @@
           >
         </div>
         <div style="display: flex; align-items: center; gap: 10px">
+          <span
+            id="loggedInAdminEmail"
+            style="font-size: 0.82rem; color: var(--text-muted)"
+          ></span>
           <button
             type="button"
             onclick="adminLogout()"
@@ -423,28 +419,22 @@
       </div>
 
       <div class="security-note">
-        <strong>Security Note:</strong> Only verified Clay Pot orders are
-        rendered here to prevent unrelated data from appearing in the dashboard.
-        For production-grade security, enable
-        <strong>Firebase Authentication</strong> and restrict Realtime Database
-        rules to authenticated admin users only.
+        <strong>Security Status:</strong> Protected by
+        <strong>Firebase Authentication</strong> and server-side
+        <strong>Realtime Database Security Rules</strong>.
       </div>
     </div>
 
-    <!-- Firebase Compat SDKs for Realtime Database -->
+    <!-- Firebase Compat SDKs for Auth & Realtime Database -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
     <script>
-      const ADMIN_GMAIL = 'yeamin@gmail.com';
-      const ADMIN_PASS = 'admin1234';
-      const ADMIN_PIN = '262149';
       const BUSINESS_WHATSAPP_NUMBER = '01898497847';
       const FIREBASE_ORDERS_PATH = 'clayPotOrders';
       const FIREBASE_DELIVERY_FEE_PATH = 'clayPotSettings/deliveryFee';
       const DELIVERY_FEE_STORAGE_KEY = 'clayPotDeliveryFee';
-      const MAX_FAILED_ATTEMPTS = 5;
-      const LOCKOUT_DURATION_MS = 60 * 1000;
 
       const firebaseConfig = {
         apiKey: 'AIzaSyDucXr5F3nd5rmSUGz-EwsxpB2e9517k_Q',
@@ -458,10 +448,10 @@
       };
 
       let rtdb = null;
+      let auth = null;
       let currentOrdersList = [];
       let isRealtimeListenerAttached = false;
-      let failedLoginCount = 0;
-      let lockedUntilTimestamp = 0;
+      let isDeliveryListenerAttached = false;
 
       try {
         if (typeof firebase !== 'undefined') {
@@ -469,6 +459,7 @@
             firebase.initializeApp(firebaseConfig);
           }
           rtdb = firebase.database();
+          auth = firebase.auth();
         }
       } catch (err) {
         console.error('Firebase init error in admin:', err);
@@ -558,6 +549,7 @@
             await rtdb.ref(FIREBASE_DELIVERY_FEE_PATH).set(cleanFee);
           } catch (err) {
             console.error('Failed to update delivery fee in Firebase:', err);
+            alert('Permission denied or network error while updating fee.');
           }
         }
       }
@@ -579,7 +571,9 @@
         );
         updateAdminDeliveryFeeLabel(localFee);
 
-        if (!rtdb) return;
+        if (!rtdb || isDeliveryListenerAttached) return;
+        isDeliveryListenerAttached = true;
+
         rtdb.ref(FIREBASE_DELIVERY_FEE_PATH).on('value', (snap) => {
           if (snap.exists() && snap.val() !== null && snap.val() !== '') {
             const parsed = Number(snap.val());
@@ -591,74 +585,103 @@
         });
       }
 
+      function showDashboard(userEmail) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminDashboardContent').style.display =
+          'block';
+        const emailBadge = document.getElementById('loggedInAdminEmail');
+        if (emailBadge && userEmail) {
+          emailBadge.textContent = userEmail;
+        }
+        startRealtimeOrdersListener();
+        startDeliveryFeeControlListener();
+      }
+
+      function showLoginScreen() {
+        if (rtdb && isRealtimeListenerAttached) {
+          rtdb.ref(FIREBASE_ORDERS_PATH).off();
+          isRealtimeListenerAttached = false;
+        }
+        if (rtdb && isDeliveryListenerAttached) {
+          rtdb.ref(FIREBASE_DELIVERY_FEE_PATH).off();
+          isDeliveryListenerAttached = false;
+        }
+        currentOrdersList = [];
+        document.getElementById('adminDashboardContent').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+      }
+
       window.addEventListener('DOMContentLoaded', function () {
         const savedTheme = localStorage.getItem('theme') || 'light';
         if (savedTheme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
         }
 
-        const isLoggedIn = sessionStorage.getItem('clayPotAdminLoggedIn');
-        if (isLoggedIn === 'true') {
-          showDashboard();
+        if (auth) {
+          auth.onAuthStateChanged((user) => {
+            if (user) {
+              showDashboard(user.email);
+            } else {
+              showLoginScreen();
+            }
+          });
         }
       });
 
-      function showDashboard() {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminDashboardContent').style.display =
-          'block';
-        startRealtimeOrdersListener();
-        startDeliveryFeeControlListener();
-      }
-
       document
         .getElementById('adminLoginForm')
-        .addEventListener('submit', function (e) {
+        .addEventListener('submit', async function (e) {
           e.preventDefault();
           const errorMsg = document.getElementById('loginError');
-          const now = Date.now();
+          const submitBtn = document.getElementById('loginSubmitBtn');
 
-          if (now < lockedUntilTimestamp) {
-            const remainingSec = Math.ceil((lockedUntilTimestamp - now) / 1000);
-            errorMsg.textContent = `Too many failed attempts. Try again in ${remainingSec}s.`;
+          if (!auth) {
+            errorMsg.textContent = 'Firebase Authentication failed to load.';
             errorMsg.style.display = 'block';
             return;
           }
 
-          const email = document
-            .getElementById('adminEmail')
-            .value.trim()
-            .toLowerCase();
-          const pass = document.getElementById('adminPassword').value.trim();
-          const pin = document.getElementById('adminPin').value.trim();
+          const email = document.getElementById('adminEmail').value.trim();
+          const pass = document.getElementById('adminPassword').value;
 
-          if (
-            email === ADMIN_GMAIL.toLowerCase() &&
-            pass === ADMIN_PASS &&
-            pin === ADMIN_PIN
-          ) {
-            failedLoginCount = 0;
-            lockedUntilTimestamp = 0;
-            errorMsg.style.display = 'none';
-            sessionStorage.setItem('clayPotAdminLoggedIn', 'true');
-            showDashboard();
-          } else {
-            failedLoginCount += 1;
-            if (failedLoginCount >= MAX_FAILED_ATTEMPTS) {
-              lockedUntilTimestamp = Date.now() + LOCKOUT_DURATION_MS;
+          errorMsg.style.display = 'none';
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Signing in...';
+
+          try {
+            await auth.signInWithEmailAndPassword(email, pass);
+          } catch (err) {
+            console.error('Firebase Auth error:', err);
+            if (
+              err.code === 'auth/invalid-credential' ||
+              err.code === 'auth/wrong-password' ||
+              err.code === 'auth/user-not-found'
+            ) {
+              errorMsg.textContent = 'Invalid Admin Email or Password!';
+            } else if (err.code === 'auth/too-many-requests') {
               errorMsg.textContent =
-                'Too many failed attempts! Locked for 60 seconds.';
+                'Too many failed attempts. Please wait and try again later.';
             } else {
-              const left = MAX_FAILED_ATTEMPTS - failedLoginCount;
-              errorMsg.textContent = `Invalid Gmail, Password, or PIN! (${left} attempts left)`;
+              errorMsg.textContent =
+                err.message || 'Login failed. Please try again.';
             }
             errorMsg.style.display = 'block';
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Login to Dashboard';
           }
         });
 
-      function adminLogout() {
+      async function adminLogout() {
+        try {
+          if (auth) {
+            await auth.signOut();
+          }
+        } catch (err) {
+          console.error('Logout error:', err);
+        }
         sessionStorage.removeItem('clayPotAdminLoggedIn');
-        location.reload();
+        showLoginScreen();
       }
 
       function normalizeOrdersFromSnapshot(snapshotVal) {
@@ -704,19 +727,8 @@
         const syncBadge = document.getElementById('cloudSyncStatus');
 
         if (!rtdb) {
-          if (syncBadge) syncBadge.textContent = '● Local Mode';
-          const localOrders = (
-            JSON.parse(localStorage.getItem('clayPotOrders')) || []
-          ).filter(isValidClayPotOrder);
-          currentOrdersList = localOrders.map((o, idx) => ({
-            ...o,
-            status: normalizeStatusValue(o.status),
-            _fbKey: (o.orderId || `local_${idx}`).replace(
-              /[^a-zA-Z0-9_-]/g,
-              '_'
-            ),
-          }));
-          renderAdminOrdersTable(currentOrdersList);
+          if (syncBadge) syncBadge.textContent = '● Database Unavailable';
+          renderAdminOrdersTable([]);
           return;
         }
 
@@ -739,15 +751,9 @@
           },
           (error) => {
             console.error('Realtime Database read error:', error);
-            if (syncBadge) syncBadge.textContent = '● Offline / Local Fallback';
-            const localOrders = (
-              JSON.parse(localStorage.getItem('clayPotOrders')) || []
-            ).filter(isValidClayPotOrder);
-            currentOrdersList = localOrders.map((o) => ({
-              ...o,
-              status: normalizeStatusValue(o.status),
-            }));
-            renderAdminOrdersTable(currentOrdersList);
+            if (syncBadge) syncBadge.textContent = '● Access Denied / Offline';
+            currentOrdersList = [];
+            renderAdminOrdersTable([]);
           }
         );
       }
@@ -869,12 +875,6 @@
         currentOrdersList = currentOrdersList.map((o) =>
           o._fbKey === fbKey ? { ...o, status: normalized } : o
         );
-        try {
-          localStorage.setItem(
-            'clayPotOrders',
-            JSON.stringify(currentOrdersList)
-          );
-        } catch {}
 
         if (rtdb && fbKey) {
           try {
@@ -884,6 +884,7 @@
             return;
           } catch (err) {
             console.error('Status update failed on Firebase:', err);
+            alert('Failed to update status in Firebase.');
           }
         }
 
@@ -913,13 +914,9 @@
             return;
           } catch (err) {
             console.error('Delete failed on Firebase:', err);
+            alert('Failed to delete order from Firebase.');
           }
         }
-
-        const filtered = currentOrdersList.filter((o) => o._fbKey !== fbKey);
-        currentOrdersList = filtered;
-        localStorage.setItem('clayPotOrders', JSON.stringify(filtered));
-        renderAdminOrdersTable(filtered);
       }
 
       async function clearAllOrders() {
@@ -937,12 +934,9 @@
             return;
           } catch (err) {
             console.error('Clear all failed on Firebase:', err);
+            alert('Failed to clear orders from Firebase.');
           }
         }
-
-        currentOrdersList = [];
-        localStorage.removeItem('clayPotOrders');
-        renderAdminOrdersTable([]);
       }
 
       function buildStatusWiseWhatsAppMessage(order) {
