@@ -439,6 +439,7 @@
       const ADMIN_GMAIL = 'yeamin@gmail.com';
       const ADMIN_PASS = 'admin1234';
       const ADMIN_PIN = '262149';
+      const BUSINESS_WHATSAPP_NUMBER = '01898497847';
       const FIREBASE_ORDERS_PATH = 'clayPotOrders';
       const FIREBASE_DELIVERY_FEE_PATH = 'clayPotSettings/deliveryFee';
       const DELIVERY_FEE_STORAGE_KEY = 'clayPotDeliveryFee';
@@ -484,6 +485,15 @@
 
       function sanitizePhoneHref(phoneStr) {
         return String(phoneStr ?? '').replace(/[^+\d]/g, '');
+      }
+
+      function formatPhoneForWhatsApp(phoneStr) {
+        if (!phoneStr) return '';
+        let digits = String(phoneStr).replace(/\D/g, '');
+        if (!digits) return '';
+        if (digits.startsWith('880')) return digits;
+        if (digits.startsWith('0')) return '88' + digits;
+        return '880' + digits;
       }
 
       function normalizeStatusValue(status) {
@@ -838,6 +848,9 @@
               </select>
             </td>
             <td style="text-align: center; white-space: nowrap;">
+              <button type="button" onclick="openOrderWhatsApp('${encodeURIComponent(
+                order.orderId
+              )}')" style="background: #25d366; color: #fff; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-right: 4px; font-weight: 600;" title="Send WhatsApp Update">💬</button>
               <button type="button" onclick="printInvoice('${encodeURIComponent(
                 order.orderId
               )}')" style="background: #3498db; color: #fff; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-right: 4px;" title="Print Invoice">🖨️</button>
@@ -852,6 +865,17 @@
 
       async function updateOrderStatus(fbKey, newStatus) {
         const normalized = normalizeStatusValue(newStatus);
+
+        currentOrdersList = currentOrdersList.map((o) =>
+          o._fbKey === fbKey ? { ...o, status: normalized } : o
+        );
+        try {
+          localStorage.setItem(
+            'clayPotOrders',
+            JSON.stringify(currentOrdersList)
+          );
+        } catch {}
+
         if (rtdb && fbKey) {
           try {
             await rtdb
@@ -863,12 +887,7 @@
           }
         }
 
-        const updated = currentOrdersList.map((o) =>
-          o._fbKey === fbKey ? { ...o, status: normalized } : o
-        );
-        currentOrdersList = updated;
-        localStorage.setItem('clayPotOrders', JSON.stringify(updated));
-        renderAdminOrdersTable(updated);
+        renderAdminOrdersTable(currentOrdersList);
       }
 
       function filterOrders() {
@@ -924,6 +943,72 @@
         currentOrdersList = [];
         localStorage.removeItem('clayPotOrders');
         renderAdminOrdersTable([]);
+      }
+
+      function buildStatusWiseWhatsAppMessage(order) {
+        const status = normalizeStatusValue(order.status);
+        const customerName = order.name || 'Customer';
+        const orderId = order.orderId || 'N/A';
+        const address = order.address || 'N/A';
+        const itemsSummary = (order.items || [])
+          .map((i) => `${i.name} (x${i.qty})`)
+          .join(', ');
+        const totalAmount = Number(order.total || 0);
+
+        let statusNote = `আপনার অর্ডারের বর্তমান স্ট্যাটাস হলো *${status}*।`;
+        if (status === 'Pending') {
+          statusNote =
+            'আপনার অর্ডারটি আমরা পেয়েছি এবং বর্তমানে এটি *Pending* অবস্থায় রয়েছে। খুব দ্রুতই আপনার অর্ডারটি যাচাই করে কনফার্ম করা হবে।';
+        } else if (status === 'Confirmed') {
+          statusNote =
+            'আপনার অর্ডারটি *Confirmed* হয়েছে! সতেজ বগুড়ার দইয়ের ব্যাচের সাথে সামঞ্জস্য রেখে আমরা আপনার অর্ডারটি প্রস্তুত করার প্রস্তুতি নিচ্ছি।';
+        } else if (status === 'Processing') {
+          statusNote =
+            'আপনার অর্ডারটি বর্তমানে *Processing* অবস্থায় রয়েছে এবং যত্নসহকারে প্যাকিং ও ডেলিভারির কাজ চলছে।';
+        } else if (status === 'Delivered') {
+          statusNote =
+            'আপনার অর্ডারটি *Delivered* হয়েছে। খাঁটি স্বাদ উপভোগ করুন এবং *The Clay Pot*-এর সাথে থাকার জন্য আন্তরিক ধন্যবাদ!';
+        } else if (status === 'Cancelled') {
+          statusNote =
+            'দুঃখিত, আপনার এই অর্ডারটি *Cancelled* হয়েছে। কোনো প্রশ্ন বা নতুন করে অর্ডার করতে চাইলে এই নম্বরে যোগাযোগ করুন।';
+        }
+
+        return [
+          `আসসালামু আলাইকুম ${customerName},`,
+          `*The Clay Pot* থেকে বলছি।`,
+          ``,
+          `📦 *Order ID:* ${orderId}`,
+          itemsSummary ? `🍯 *Items:* ${itemsSummary}` : null,
+          `💰 *Total:* ৳${totalAmount}`,
+          `📍 *Delivery Address:* ${address}`,
+          ``,
+          statusNote,
+          ``,
+          `যেকোনো সহায়তা বা তথ্যের জন্য যোগাযোগ: ${BUSINESS_WHATSAPP_NUMBER}`,
+        ]
+          .filter(Boolean)
+          .join('\n');
+      }
+
+      function openOrderWhatsApp(encodedOrderId) {
+        const targetId = decodeURIComponent(encodedOrderId);
+        const order = currentOrdersList.find((o) => o.orderId === targetId);
+        if (!order) {
+          alert('অর্ডারের তথ্য খুঁজে পাওয়া যায়নি।');
+          return;
+        }
+
+        const waPhone = formatPhoneForWhatsApp(order.phone);
+        if (!waPhone) {
+          alert('কাস্টমারের বৈধ হোয়াটসঅ্যাপ/ফোন নম্বর পাওয়া যায়নি।');
+          return;
+        }
+
+        const messageText = buildStatusWiseWhatsAppMessage(order);
+        const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(
+          messageText
+        )}`;
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
       }
 
       function printInvoice(encodedOrderId) {
