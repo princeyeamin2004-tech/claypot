@@ -433,6 +433,7 @@
     <script>
       const BUSINESS_WHATSAPP_NUMBER = '01898497847';
       const FIREBASE_ORDERS_PATH = 'clayPotOrders';
+      const FIREBASE_ORDER_STATUS_PATH = 'clayPotOrderStatus';
       const FIREBASE_DELIVERY_FEE_PATH = 'clayPotSettings/deliveryFee';
       const DELIVERY_FEE_STORAGE_KEY = 'clayPotDeliveryFee';
 
@@ -488,7 +489,7 @@
       }
 
       function normalizeStatusValue(status) {
-        const s = String(status || 'Confirmed')
+        const s = String(status || 'Pending')
           .trim()
           .toLowerCase();
         if (s === 'pending') return 'Pending';
@@ -502,7 +503,8 @@
           return 'Delivered';
         }
         if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
-        return 'Confirmed';
+        if (s === 'confirmed' || s === 'accepted') return 'Confirmed';
+        return 'Pending';
       }
 
       function isValidClayPotOrder(item) {
@@ -713,7 +715,7 @@
               address: String(data.address || 'N/A').trim(),
               items: cleanItems,
               total: Number(data.total || 0),
-              status: normalizeStatusValue(data.status || 'Confirmed'),
+              status: normalizeStatusValue(data.status || 'Pending'),
               date: String(data.date || 'Recent').trim(),
               createdAt: Number(data.createdAt || 0),
             };
@@ -881,6 +883,9 @@
             await rtdb
               .ref(`${FIREBASE_ORDERS_PATH}/${fbKey}/status`)
               .set(normalized);
+            await rtdb
+              .ref(`${FIREBASE_ORDER_STATUS_PATH}/${fbKey}`)
+              .set(normalized);
             return;
           } catch (err) {
             console.error('Status update failed on Firebase:', err);
@@ -911,6 +916,7 @@
         if (rtdb && fbKey) {
           try {
             await rtdb.ref(`${FIREBASE_ORDERS_PATH}/${fbKey}`).remove();
+            await rtdb.ref(`${FIREBASE_ORDER_STATUS_PATH}/${fbKey}`).remove();
             return;
           } catch (err) {
             console.error('Delete failed on Firebase:', err);
@@ -931,6 +937,7 @@
         if (rtdb) {
           try {
             await rtdb.ref(FIREBASE_ORDERS_PATH).remove();
+            await rtdb.ref(FIREBASE_ORDER_STATUS_PATH).remove();
             return;
           } catch (err) {
             console.error('Clear all failed on Firebase:', err);

@@ -5,6 +5,7 @@ const DELIVERY_FEE_STORAGE_KEY = 'clayPotDeliveryFee';
 const FIREBASE_DELIVERY_FEE_PATH = 'clayPotSettings/deliveryFee';
 const CUSTOMER_ORDERS_KEY = 'clayPotCustomerOrders';
 const FIREBASE_ORDERS_PATH = 'clayPotOrders';
+const FIREBASE_ORDER_STATUS_PATH = 'clayPotOrderStatus';
 
 // Firebase Configuration (`the-clay-pot` Realtime Database)
 const firebaseConfig = {
@@ -125,8 +126,6 @@ const translations = {
     noActiveOrders:
       'No active order right now. Completed or cancelled orders appear in History.',
     noHistoryOrders: 'No delivered or cancelled order history found yet.',
-    latestConfirmMsg:
-      'Live Order Tracker: Status syncs automatically with your order updates.',
     clearHistoryBtn: 'Clear History',
     orderIdLabel: 'Order ID',
     dateLabel: 'Time',
@@ -168,15 +167,15 @@ const translations = {
     exploreBtn: 'আমাদের ঐতিহ্য জানুন',
     collTitle: 'আমাদের সিগনেচার কালেকশন',
     collDesc:
-      'বিশুদ্ধ গরুর দুধ ও ঐতিহ্যবাহী মাটির পাত্রে ছোট ব্যাচে প্রতিদিন তৈরি।',
+      'বিশুদ্ধ গরুর দুধ ও ঐতিহবাহী মাটির পাত্রে ছোট ব্যাচে প্রতিদিন তৈরি।',
     soilTitle: 'বগুড়ার মাটির ছোঁয়া',
-    soilDesc: 'জেনে নিন কেন আমাদের ঐতিহ্যবাহী প্রণালী সবার চেয়ে আলাদা।',
+    soilDesc: 'জেনে নিন কেন আমাদের ঐতিহবাহী প্রণালী সবার চেয়ে আলাদা।',
     feat1Title: 'অগভীর পোড়ামাটির পাত্র',
     feat1Desc:
       'প্রাকৃতিক মাটির পাত্র অতিরিক্ত আর্দ্রতা শোষণ করে দইকে করে তোলে ঘন, তুলতুলে ও সুবাসিত।',
     feat2Title: '১০০% খাঁটি দুধ',
     feat2Desc:
-      'কোনো কৃত্রিম উপাদান বা প্রিজার্ভেটিভ ছাড়া নিখাদ ও ঐতিহ্যবাহী স্বাদের সমাহার।',
+      'কোনো কৃত্রিম উপাদান বা প্রিজার্ভেটিভ ছাড়া নিখাদ ও ঐতিহবাহী স্বাদের সমাহার।',
     feat3Title: 'তাজা ও দ্রুত হোম ডেলিভারি',
     feat3Desc:
       'মোহাম্মদপুর, ধানমন্ডি এবং আশেপাশের এলাকায় একদম ঠাণ্ডা ও সতেজ অবস্থায় হোম ডেলিভারি।',
@@ -222,8 +221,6 @@ const translations = {
     noActiveOrders:
       'বর্তমানে কোনো চলমান অর্ডার নেই। ডেলিভার্ড বা ক্যান্সেলড অর্ডার হিস্ট্রিতে দেখা যাবে।',
     noHistoryOrders: 'এখনো কোনো ডেলিভার্ড বা ক্যান্সেলড অর্ডার হিস্ট্রি নেই।',
-    latestConfirmMsg:
-      'লাইভ অর্ডার ট্র্যাকার: অ্যাডমিন স্ট্যাটাস অনুযায়ী এটি স্বয়ংক্রিয়ভাবে আপডেট হয়।',
     clearHistoryBtn: 'হিস্ট্রি মুছুন',
     orderIdLabel: 'অর্ডার আইডি',
     dateLabel: 'সময়',
@@ -643,7 +640,7 @@ function setFieldValidationState(inputEl, errorEl, result) {
 }
 
 // ==========================================
-// ORDER STATUS NORMALIZATION & LIVE SYNC
+// ORDER STATUS NORMALIZATION, NOTIFICATION & LIVE SYNC
 // ==========================================
 function normalizeOrderStatus(rawStatus) {
   const s = String(rawStatus || 'Pending')
@@ -660,7 +657,7 @@ function normalizeOrderStatus(rawStatus) {
     return 'Delivered';
   }
   if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
-  if (s === 'confirmed') return 'Confirmed';
+  if (s === 'confirmed' || s === 'accepted') return 'Confirmed';
   return 'Pending';
 }
 
@@ -690,7 +687,56 @@ function getOrderFirebaseKey(orderId) {
   return String(orderId || '').replace(/[^a-zA-Z0-9_-]/g, '_');
 }
 
-function syncOrderStatusLocally(orderId, nextStatus) {
+function showCustomerStatusAlert(orderId, newStatus) {
+  const t = translations[currentLang] || translations.en;
+  const badgeInfo = getStatusBadgeInfo(newStatus, t);
+  const msgText =
+    currentLang === 'bn'
+      ? `অর্ডার ${orderId} এর স্ট্যাটাস আপডেট হয়েছে: ${badgeInfo.text}`
+      : `Order ${orderId} status updated: ${badgeInfo.text}`;
+
+  let banner = document.getElementById('liveOrderStatusBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'liveOrderStatusBanner';
+    banner.style.cssText = [
+      'position: fixed',
+      'bottom: 20px',
+      'right: 20px',
+      'z-index: 2500',
+      'background: var(--surface, #fff)',
+      'color: var(--espresso, #2c1e16)',
+      'border: 1px solid var(--border, #e2d6c8)',
+      'border-left: 4px solid var(--terracotta, #b85d3b)',
+      'box-shadow: 0 10px 28px rgba(0,0,0,0.16)',
+      'padding: 12px 16px',
+      'border-radius: 10px',
+      'font-size: 0.88rem',
+      'font-weight: 600',
+      'max-width: 340px',
+    ].join(';');
+    document.body.appendChild(banner);
+  }
+
+  banner.textContent = msgText;
+  banner.style.display = 'block';
+
+  clearTimeout(window.__orderBannerTimer);
+  window.__orderBannerTimer = setTimeout(() => {
+    if (banner) banner.style.display = 'none';
+  }, 5000);
+
+  if (
+    typeof Notification !== 'undefined' &&
+    Notification.permission === 'granted'
+  ) {
+    try {
+      new Notification('The Clay Pot', { body: msgText });
+    } catch {}
+  }
+}
+
+function syncOrderStatusLocally(orderId, nextStatus, shouldNotify = true) {
   const normalized = normalizeOrderStatus(nextStatus);
   let changed = false;
 
@@ -712,15 +758,10 @@ function syncOrderStatusLocally(orderId, nextStatus) {
       JSON.stringify(updatedCustomerList)
     );
     updateCustomerOrderBadges();
+    if (shouldNotify) {
+      showCustomerStatusAlert(orderId, normalized);
+    }
   }
-
-  try {
-    const adminList = JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-    const updatedAdminList = adminList.map((ord) =>
-      ord.orderId === orderId ? { ...ord, status: normalized } : ord
-    );
-    localStorage.setItem('clayPotOrders', JSON.stringify(updatedAdminList));
-  } catch {}
 
   const modal = document.getElementById('customerOrdersModal');
   if (modal && modal.style.display === 'block') {
@@ -733,17 +774,23 @@ function syncOrderStatusLocally(orderId, nextStatus) {
   }
 }
 
+const activeCustomerStatusListeners = new Set();
+
 function attachRealtimeListenersForCustomerOrders() {
   if (!rtdb) return;
   const orders = getCustomerOrders();
   orders.forEach((ord) => {
     if (!ord || !ord.orderId) return;
     const key = getOrderFirebaseKey(ord.orderId);
-    const ref = rtdb.ref(`${FIREBASE_ORDERS_PATH}/${key}/status`);
-    ref.off();
+    if (activeCustomerStatusListeners.has(key)) return;
+    activeCustomerStatusListeners.add(key);
+
+    let isFirstSnapshot = true;
+    const ref = rtdb.ref(`${FIREBASE_ORDER_STATUS_PATH}/${key}`);
     ref.on('value', (snap) => {
       if (snap.exists() && snap.val()) {
-        syncOrderStatusLocally(ord.orderId, snap.val());
+        syncOrderStatusLocally(ord.orderId, snap.val(), !isFirstSnapshot);
+        isFirstSnapshot = false;
       }
     });
   });
@@ -759,13 +806,6 @@ async function saveOrderToFirebaseRealtime(orderObj) {
     status: initialStatus,
   };
 
-  try {
-    let existingOrders =
-      JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-    existingOrders.unshift(normalizedOrder);
-    localStorage.setItem('clayPotOrders', JSON.stringify(existingOrders));
-  } catch {}
-
   if (!rtdb) {
     throw new Error('Realtime Database is not initialized');
   }
@@ -775,17 +815,8 @@ async function saveOrderToFirebaseRealtime(orderObj) {
     ...normalizedOrder,
     createdAt: Date.now(),
   });
+  await rtdb.ref(`${FIREBASE_ORDER_STATUS_PATH}/${safeKey}`).set(initialStatus);
 }
-
-window.fetchCloudOrders = async function () {
-  if (!rtdb) return [];
-  const snapshot = await rtdb.ref(FIREBASE_ORDERS_PATH).get();
-  if (!snapshot.exists()) return [];
-  const val = snapshot.val();
-  return Object.values(val).sort(
-    (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
-  );
-};
 
 function getCustomerOrders() {
   try {
@@ -849,7 +880,7 @@ function formatOrderItemsText(items) {
   return items.map((i) => `${i.name} × ${i.qty}`).join(', ');
 }
 
-function renderOrderCardHtml(order, t, showTrackerNote = false) {
+function renderOrderCardHtml(order, t) {
   const badgeInfo = getStatusBadgeInfo(order.status, t);
   return `
     <div class="order-record-card">
@@ -861,11 +892,6 @@ function renderOrderCardHtml(order, t, showTrackerNote = false) {
     badgeInfo.text
   }</span>
       </div>
-      ${
-        showTrackerNote
-          ? `<p style="font-size: 0.84rem; color: var(--espresso); background: var(--surface); padding: 8px 10px; border-radius: 8px; border: 1px dashed var(--border); margin-bottom: 8px;">${t.latestConfirmMsg}</p>`
-          : ''
-      }
       <p style="margin-bottom: 4px;"><strong>${
         t.itemsLabel
       }:</strong> ${formatOrderItemsText(order.items)}</p>
@@ -902,7 +928,7 @@ window.renderCustomerOrdersView = function (mode, titleEl, bodyEl, lang) {
     }
 
     const cardsHtml = historyOrders
-      .map((ord) => renderOrderCardHtml(ord, t, false))
+      .map((ord) => renderOrderCardHtml(ord, t))
       .join('');
 
     bodyEl.innerHTML = `
@@ -928,7 +954,7 @@ window.renderCustomerOrdersView = function (mode, titleEl, bodyEl, lang) {
     }
 
     bodyEl.innerHTML = activeOrders
-      .map((ord, idx) => renderOrderCardHtml(ord, t, idx === 0))
+      .map((ord) => renderOrderCardHtml(ord, t))
       .join('');
   }
 };
@@ -1296,6 +1322,13 @@ if (checkoutForm) {
           : 'Please add at least one item to your basket first.'
       );
       return;
+    }
+
+    if (
+      typeof Notification !== 'undefined' &&
+      Notification.permission === 'default'
+    ) {
+      Notification.requestPermission().catch(() => {});
     }
 
     const firstNameInput = document.getElementById('custFirstName');
