@@ -196,7 +196,7 @@ const translations = {
     codDesc: 'ঢাকায় অর্ডার হাতে পাওয়ার পর ডেলিভারি রাইডারকে ক্যাশ টাকা দিন।',
     delTitle: '🚚 ডেলিভারি ও কভারেজ',
     delDesc:
-      'মোহাম্মদপুর, ধানমন্ডি, লালমাটিয়া এবং এর আশপাশে ডেলিভারি করা হয়। ডেলিভারি চার্জ অ্যাডমিন প্যানেল থেকে নিয়ন্ত্রণ করা যায়।',
+      'মোহাম্মদপুর, ধানমন্ডি, লালমাটিয়া এবং এর আশপাশে ডেলিভারি করা হয়। ডেলিভারি চার্জ অ্যাডমিন প্যানেল থেকে নিয়ন্ত্রণ করা যায়।',
     footerSub: 'ঐতিহ্যের শিকড়ে, মাটির ছোঁয়া।',
     footerNote: 'ঢাকা ডেলিভারি হটলাইন / হোয়াটসঅ্যাপ সাপোর্ট চালু আছে।',
     waChat: 'হোয়াটসঅ্যাপ চ্যাট',
@@ -223,7 +223,7 @@ const translations = {
       'বর্তমানে কোনো চলমান অর্ডার নেই। ডেলিভার্ড বা ক্যান্সেলড অর্ডার হিস্ট্রিতে দেখা যাবে।',
     noHistoryOrders: 'এখনো কোনো ডেলিভার্ড বা ক্যান্সেলড অর্ডার হিস্ট্রি নেই।',
     latestConfirmMsg:
-      'লাইভ অর্ডার ট্র্যাকার: অ্যাডমিন স্ট্যাটাস অনুযায়ী এটি স্বয়ংক্রিয়ভাবে আপডেট হয়।',
+      'লাইভ অর্ডার ট্র্যাকার: অ্যাডমিন স্ট্যাটাস অনুযায়ী এটি স্বয়ংক্রিয়ভাবে আপডেট হয়।',
     clearHistoryBtn: 'হিস্ট্রি মুছুন',
     orderIdLabel: 'অর্ডার আইডি',
     dateLabel: 'সময়',
@@ -646,7 +646,7 @@ function setFieldValidationState(inputEl, errorEl, result) {
 // ORDER STATUS NORMALIZATION & LIVE SYNC
 // ==========================================
 function normalizeOrderStatus(rawStatus) {
-  const s = String(rawStatus || 'Confirmed')
+  const s = String(rawStatus || 'Pending')
     .trim()
     .toLowerCase();
   if (s === 'pending') return 'Pending';
@@ -660,7 +660,8 @@ function normalizeOrderStatus(rawStatus) {
     return 'Delivered';
   }
   if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
-  return 'Confirmed';
+  if (s === 'confirmed') return 'Confirmed';
+  return 'Pending';
 }
 
 function isFinalOrHistoryStatus(status) {
@@ -752,10 +753,16 @@ function attachRealtimeListenersForCustomerOrders() {
 // FIREBASE & LOCALSTORAGE ORDER PERSISTENCE
 // ==========================================
 async function saveOrderToFirebaseRealtime(orderObj) {
+  const initialStatus = normalizeOrderStatus(orderObj.status || 'Pending');
+  const normalizedOrder = {
+    ...orderObj,
+    status: initialStatus,
+  };
+
   try {
     let existingOrders =
       JSON.parse(localStorage.getItem('clayPotOrders')) || [];
-    existingOrders.unshift(orderObj);
+    existingOrders.unshift(normalizedOrder);
     localStorage.setItem('clayPotOrders', JSON.stringify(existingOrders));
   } catch {}
 
@@ -763,10 +770,9 @@ async function saveOrderToFirebaseRealtime(orderObj) {
     throw new Error('Realtime Database is not initialized');
   }
 
-  const safeKey = getOrderFirebaseKey(orderObj.orderId);
+  const safeKey = getOrderFirebaseKey(normalizedOrder.orderId);
   await rtdb.ref(`${FIREBASE_ORDERS_PATH}/${safeKey}`).set({
-    ...orderObj,
-    status: normalizeOrderStatus(orderObj.status || 'Confirmed'),
+    ...normalizedOrder,
     createdAt: Date.now(),
   });
 }
@@ -793,7 +799,7 @@ function saveCustomerOrder(orderObj) {
   const list = getCustomerOrders();
   list.unshift({
     ...orderObj,
-    status: normalizeOrderStatus(orderObj.status || 'Confirmed'),
+    status: normalizeOrderStatus(orderObj.status || 'Pending'),
   });
   localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.stringify(list));
   updateCustomerOrderBadges();
@@ -1357,7 +1363,7 @@ if (checkoutForm) {
       })),
       deliveryFee: currentDeliveryFee,
       total,
-      status: 'Confirmed',
+      status: 'Pending',
       date: new Date().toLocaleString(),
     };
 
